@@ -16,12 +16,6 @@ function simplesamlphp_auth_install() {
 		$query2 = db_query("UPDATE {permission} SET perm = '".$new_perms."' WHERE rid = 2");
 	}
 	
-	//Hide Login block by default
-	//$query3 = db_query("UPDATE {blocks} SET status='0' WHERE module='user' AND delta='0'");
-	
-	//Remove Logout from the menu by default
-	//$query4 = db_query("UPDATE {menu} SET type=48 WHERE path='logout'");
-	
 	//Disable the open registration to the site and store the original setting.
 	$original = variable_get("user_register","1");
 	variable_set("user_register","0");
@@ -42,9 +36,6 @@ function simplesamlphp_auth_uninstall() {
 
 	//Show Login block by default
 	$query1 = db_query("UPDATE {blocks} SET status='1' WHERE module='user' AND delta='0'");
-	
-	//Restore Logout from the menu by default
-	//$query2 = db_query("UPDATE {menu} SET type=54 WHERE path='logout'");
 	
 	//Restore the original user registration directive
 	$original = variable_get("simplesamlphp_auth_user_register_original","1");
