@@ -816,7 +816,7 @@ function _simplesaml_auth_debug($message) {
 function _simplesamlphp_auth_destroy_drupal_session() {
     global $user;
 
-    watchdog('user', t('Session closed for %name.'), array('%name' => $user->name));
+    watchdog('user', 'Session closed for %name.', array('%name' => $user->name));
 
     // Destroy the current session:
     session_destroy();
