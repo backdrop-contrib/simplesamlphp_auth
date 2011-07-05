@@ -24,6 +24,7 @@
  */
 
 
+
 /**
  * Implements hook_menu().
  */
@@ -64,7 +65,6 @@ function simplesamlphp_auth_admin_paths() {
 
 
 
-
 /**
  * Implements hook_help().
  */
@@ -81,21 +81,21 @@ function simplesamlphp_auth_help($path, $arg) {
 
 
 
-
 /**
  * Implements hook_permission().
  */
 function simplesamlphp_auth_permission() {
 
   return array(
-    'administer simpleSAMLphp authentication' => array(
-    'title' => t('Administer simpleSAMLphp authentication')
-    )
+    'administer simpleSAMLphp authentication' => array('title' => t('Administer simpleSAMLphp authentication'))
   );
 }
 
 
 
+/**
+ * Represents the Drupal page (saml_login), which triggers user authentication against the SimpleSAMLphp service provider.
+ */
 function simplesamlphp_auth_loginpage() {
 
   global $user;
@@ -162,7 +162,7 @@ function simplesamlphp_auth_init() {
 
   // Make sure we know where SimpleSAMLphp is.
   if (!file_exists($basedir)) {
-    $failure = t('SimpleSAMLphp could not be found at ' . $basedir . '. The simplesamlphp_auth module cannot function until the path to the local SimpleSAMLphp instance is configured.');
+    $failure = t('SimpleSAMLphp could not be found at %basedir . The simplesamlphp_auth module cannot function until the path to the local SimpleSAMLphp instance is configured.', array('%basedir' => $basedir));
 
     watchdog('simplesamlphp_auth', $failure, NULL, WATCHDOG_WARNING);
 
@@ -193,12 +193,12 @@ function simplesamlphp_auth_init() {
       // Get unique identifier from saml attributes.
       $authname = _simplesamlphp_auth_get_authname();
 
-      _simplesaml_auth_debug('Authname is [' . $authname . '] userid is [' . $user->uid . ']');
+      _simplesaml_auth_debug(t('Authname is [%authname] userid is [%uid]', array('%authname' => $authname, '%uid' => $user->uid)));
 
       if (!empty($authname)) {
         // User is logged in with SAML authentication and we got the unique identifier.
         // Try to log into Drupal.
-        _simplesaml_auth_debug('Load user [' . $authname . ']');
+        _simplesaml_auth_debug(t('Load user [%authname]', array('%authname' => $authname)));
 
         // Retrieve user mapping and attempt to log the user in.
         $ext_user = user_external_load($authname);
@@ -209,7 +209,8 @@ function simplesamlphp_auth_init() {
           if (variable_get('simplesamlphp_auth_registerusers', TRUE)) {
 
             // We are allowed to register new users.
-            _simplesaml_auth_debug('Register user [' . $authname . ']');
+            _simplesaml_auth_debug(t('Register [%authname]', array('%authname' => $authname)));
+
             user_external_login_register($authname, 'simplesamlphp_auth');
 
             if ($user) {
@@ -240,7 +241,7 @@ function simplesamlphp_auth_init() {
             // If the user is already registered...
             // Update the roles.
             // Populate roles based on configuration setting.
-            _simplesaml_auth_debug('User already registered [' . $authname . '] updating roles.');
+            _simplesaml_auth_debug(t('User already registered [%authname] updating roles.', array('%authname' => $authname)));
             $roles = _simplesamlphp_auth_rolepopulation(variable_get('simplesamlphp_auth_rolepopulation', ''));
             $userinfo = array('roles' => $roles);
 
@@ -342,7 +343,7 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
           // Get name from default attributes.
 
           try {
-              _simplesaml_auth_debug('Registering user [' . $account->name . ']');
+              _simplesaml_auth_debug(t('Registering user [%acctname]', array('%acctname' => $account->name)));
               $account->name = _simplesamlphp_auth_get_default_name($account->uid);
           } catch (Exception $e) {
               $message = t('Username is missing.' . $e->getMessage());
@@ -355,7 +356,7 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
               ->condition('uid', $account->uid)
               ->execute();
 
-          _simplesaml_auth_debug('Updating username [' . $account->name . ']');
+          _simplesaml_auth_debug(t('Updating username [%acctname]', array('%acctname' => $account->name)));
 
           // Get mail from default attribute.
           try {
@@ -373,7 +374,8 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
                   ->execute();
           }
 
-          _simplesaml_auth_debug('Updating mail [' . $mail_address . ']');
+          _simplesaml_auth_debug(t('Updating mail [%mailaddr]', array('%mailaddr' => $mail_address)));
+
       }
 
     }
@@ -401,8 +403,8 @@ function simplesamlphp_auth_user_logout($account) {
             $msg = "no_slo";
         }
 
-  // :KLUDGE: for some reason Drupal is not killing the session, even if I were to call drupal_session_destroy_uid() here.
-  session_destroy();
+        // :KLUDGE: for some reason Drupal is not killing the session, even if I were to call drupal_session_destroy_uid() here.
+        session_destroy();
 
         $_simplesamlphp_auth_as->logout('/?msg=' . $msg);
 
@@ -426,7 +428,7 @@ function simplesamlphp_auth_user_delete($account) {
 
 
 /**
- * Implements settings.
+ * Implements settings for the module.
  */
 function simplesamlphp_auth_settings() {
 
@@ -553,7 +555,6 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
 
 
 
-
 /**
  * Implements hook_block_view().
  */
@@ -567,7 +568,6 @@ function simplesamlphp_auth_block_view($delta = '') {
     }
     return $block;
 }
-
 
 
 
@@ -591,7 +591,12 @@ function simplesamlphp_auth_block_info() {
 
 
 
-
+/**
+ * Gets the authname attribute from the SAML assertion.
+ *
+ * @return
+ *   The authname attribute.
+ */
 function _simplesamlphp_auth_get_authname() {
 
     global $_simplesamlphp_auth_saml_attributes;
@@ -600,7 +605,7 @@ function _simplesamlphp_auth_get_authname() {
 
     // Check if valid local session exists..
     if (isset($_simplesamlphp_auth_saml_attributes)) {
-        _simplesaml_auth_debug('_simplesamlphp_auth_get_authname: Valid local session exist');
+        _simplesaml_auth_debug(t('_simplesamlphp_auth_get_authname: Valid local session exist'));
         if (isset($_simplesamlphp_auth_saml_attributes[variable_get('simplesamlphp_auth_unique_id', 'eduPersonPrincipalName')])) {
             $authname = $_simplesamlphp_auth_saml_attributes[variable_get('simplesamlphp_auth_unique_id', 'eduPersonPrincipalName')][0];
         }
@@ -613,6 +618,12 @@ function _simplesamlphp_auth_get_authname() {
 
 
 
+/**
+ * Gets the default name attribute from the SAML assertion.
+ *
+ * @return
+ *   The name attribute.
+ */
 function _simplesamlphp_auth_get_default_name($account) {
 
   global $_simplesamlphp_auth_as;
@@ -625,7 +636,7 @@ function _simplesamlphp_auth_get_default_name($account) {
 
   $auth_user_name_attr = variable_get('simplesamlphp_auth_user_name', 'eduPersonPrincipalName');
   if (!isset($_simplesamlphp_auth_saml_attributes[$auth_user_name_attr]) || !isset($_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0])) {
-    throw new Exception(t('There was no attribute named ' . $auth_user_name_attr . ' set for your user.'));
+    throw new Exception(t('There was no attribute named %auth_user_name_attr set for your user.', array('%auth_user_name_attr' => $auth_user_name_attr)));
   }
 
       $default_name = $_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0];
@@ -636,7 +647,12 @@ function _simplesamlphp_auth_get_default_name($account) {
 
 
 
-
+/**
+ * Gets the mail attribute.
+ *
+ * @return
+ *   The mail attribute.
+ */
 function _simplesamlphp_auth_get_mail() {
 
     global $_simplesamlphp_auth_as;
@@ -657,7 +673,9 @@ function _simplesamlphp_auth_get_mail() {
 
 
 
-
+/**
+ * Forces HTTPS connections.
+ */
 function _simplesamlphp_auth_forcehttps_rewrite($url) {
 
     if (variable_get('simplesamlphp_auth_forcehttps', TRUE)) {
@@ -670,7 +688,9 @@ function _simplesamlphp_auth_forcehttps_rewrite($url) {
 
 
 
-
+/**
+ * Generates the text for the log in block.
+ */
 function _simplesamlphp_auth_generate_block_text() {
 
     global $_simplesamlphp_auth_as;
@@ -690,9 +710,21 @@ function _simplesamlphp_auth_generate_block_text() {
 
 
 
+/**
+ * Evaluates a role rule.
+ *
+ * @param $roleruleevaluation
+ *   An array containing the role rule to evaluate.
+ *
+ * @param $attributes
+ *   An array containing the identity attributes.
+ *
+ * @return
+ *   An array containing role value and the attribute, or FALSE.
+ */
 function _simplesamlphp_auth_evaulaterolerule($roleruleevaluation, $attributes) {
 
-    _simplesaml_auth_debug('Evaluate rule (key=' . $roleruleevaluation[0] . ',operator=' . $roleruleevaluation[1] . ',value=' . $roleruleevaluation[2] . ')');
+    _simplesaml_auth_debug(t('Evaluate rule (key=%key,operator=%op,value=%val)', array('%key' => $roleruleevaluation[0], '%op' => $roleruleevaluation[1], '%val' => $roleruleevaluation[2])));
 
     if (!array_key_exists($roleruleevaluation[0], $attributes)) return FALSE;
     $attribute = $attributes[$roleruleevaluation[0]];
@@ -712,13 +744,22 @@ function _simplesamlphp_auth_evaulaterolerule($roleruleevaluation, $attributes) 
 
 
 
+/**
+ * Performs role population.
+ *
+ * @param $rolemap
+ *   A string containing the role map.
+ *
+ * @return
+ *   An array containing user's roles.
+ */
 function _simplesamlphp_auth_rolepopulation($rolemap) {
 
     global $_simplesamlphp_auth_as;
     global $_simplesamlphp_auth_saml_attributes;
     $roles = array();
 
-    _simplesaml_auth_debug('Rolemap: ' . $rolemap);
+    _simplesaml_auth_debug(t('Rolemap: %rolemap', array('%rolemap' => $rolemap)));
 
     // Check if valid local session exists..
     if ($_simplesamlphp_auth_as->isAuthenticated()) {
@@ -726,13 +767,13 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
 
         if (empty($rolemap)) return $roles;
 
-        _simplesaml_auth_debug('Evaluate rolemap: ' . $rolemap);
+        _simplesaml_auth_debug(t('Evaluate rolemap: %rolemap', array('%rolemap' => $rolemap)));
 
         $rolerules = explode('|', $rolemap);
 
         foreach ($rolerules AS $rolerule) {
 
-            _simplesaml_auth_debug('Evaluate role rule: ' . $rolerule);
+            _simplesaml_auth_debug(t('Evaluate role rule: %rolerule', array('%rolerule' => $rolerule)));
 
             $roleruledecompose = explode(':', $rolerule);
 
@@ -742,14 +783,14 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
             $addnew = TRUE;
             foreach ($roleruleevaluations AS $roleruleevaluation) {
 
-                _simplesaml_auth_debug('Evaluate rule evaulation: ' . $roleruleevaluation);
+                _simplesaml_auth_debug(t('Evaluate role evaulation: %roleruleeval', array('%roleruleeval' => $roleruleevaluation)));
 
                 $roleruleevaluationdc = explode(',', $roleruleevaluation);
                 if (!_simplesamlphp_auth_evaulaterolerule($roleruleevaluationdc, $attributes)) $addnew = FALSE;
             }
             if ($addnew) {
                 $roles[$roleid] = $roleid;
-                _simplesaml_auth_debug('Add new role: ' . $roleid);
+                _simplesaml_auth_debug(t('Add new role: %roleid', array('%roleid' => $roleid)));
             }
 
         }
@@ -761,20 +802,10 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
 
 /**
  * This helper function is used by developers to debug the form API workflow in this module.
- * Uncomment the function body to activate.
  */
 function _simplesaml_auth_debug($message) {
 
   watchdog('simplesamlphp', $message, NULL, WATCHDOG_DEBUG);
-}
-
-
-
-/**
- * Implements hook_exit().
- */
-function simplesamlphp_auth_exit() {
-    // Do nothing.
 }
 
 
@@ -785,7 +816,7 @@ function simplesamlphp_auth_exit() {
 function _simplesamlphp_auth_destroy_drupal_session() {
     global $user;
 
-    watchdog('user', 'Session closed for %name.', array('%name' => $user->name));
+    watchdog('user', t('Session closed for %name.'), array('%name' => $user->name));
 
     // Destroy the current session:
     session_destroy();
