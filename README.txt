@@ -1,19 +1,25 @@
 -- SUMMARY --
 
-The simplesamlphp_auth module makes it possible for Drupal to support SAML for authentication of users. The module will auto-provision user accounts into Drupal if you want it to. It can also dynamically assign Drupal roles based on identity attribute values.
+The simplesamlphp_auth module makes it possible for Drupal to support SAML for
+authentication of users. The module will auto-provision user accounts into
+Drupal if you want it to. It can also dynamically assign Drupal roles based on
+identity attribute values.
 
 
 -- PREREQUISITES --
 
-1) You must have SimpleSAMLphp installed and configured as a working service point (SP) as the module uses your local SimpleSAMLphp SP for the SAML support.
+1) You must have SimpleSAMLphp installed and configured as a working service
+   point (SP) as the module uses your local SimpleSAMLphp SP for the SAML
+   support. For more information on installing and configuring SimpleSAMLphp as
+   an SP visit: http://www.simplesamlphp.org.
 
-	For more information on installing and configuring SimpleSAMLphp as an SP visit: http://www.simplesamlphp.org
-	
-	IMPORTANT: Your SP must be configured to use memcache for session storage (in config/config.php set store.type => 'memcache')
+   IMPORTANT: Your SP must be configured to use memcache for session storage
+   (in config/config.php set store.type => 'memcache').
 
-2) You must have memcached installed on your server and PHP must have the memcache extension.
-
-	For more information on installing the memcache extension for PHP visit: http://www.php.net/manual/en/memcache.installation.php
+2) You must have memcached installed on your server and PHP must have the
+   memcache extension. For more information on installing the memcache
+   extension for PHP visit:
+   http://www.php.net/manual/en/memcache.installation.php
 
 
 -- INSTALLATION --
@@ -30,12 +36,15 @@ Assuming the prerequisites have been met, installation of this module is just li
 
 -- CONFIGURATION --
 
-The configuration of the module is fairly straight forward. You will need to know the names of the attributes that your SP will be making available to the module in order to map them into Drupal.
+The configuration of the module is fairly straight forward. You will need to
+know the names of the attributes that your SP will be making available to the
+module in order to map them into Drupal.
 
 
 -- TROUBLESHOOTING --
 
-The most common reason for things not working is the SP session storage type not being set to memcache.
+The most common reason for things not working is the SP session storage type
+not being set to memcache.
 
 
 -- CONTACT --
