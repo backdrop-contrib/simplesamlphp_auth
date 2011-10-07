@@ -99,9 +99,9 @@ function simplesamlphp_auth_loginpage() {
   $config = SimpleSAML_Configuration::getInstance();
   $configStoreType = $config->getValue('store.type');
 
-  // Make sure memcache is being used.
-  if ($configStoreType != 'memcache') {
-    watchdog('simplesamlphp_auth', 'A user attempted to login using this module but the store.type is not set to memcache.', NULL, WATCHDOG_WARNING);
+  // Make sure phpsession is NOT being used.
+  if ($configStoreType == 'phpsession') {
+    watchdog('simplesamlphp_auth', 'A user attempted to login using simplesamlphp but the store.type is phpsession, use memcache or sql for simplesamlphp session storage. See: simplesamlphp/config/config.php.', NULL, WATCHDOG_WARNING);
     $fail = TRUE;
   }
 
@@ -139,22 +139,13 @@ function simplesamlphp_auth_init() {
   global $_simplesamlphp_auth_saml_config;
   global $_simplesamlphp_auth_saml_version;
 
+//  if (!_simplesamlphp_auth_isEnabled()) {
+    // Exit without initializing.
+//    return;
+//  }
+
   // Get the simplesamlphp session.
   $basedir = variable_get('simplesamlphp_auth_installdir', '/var/simplesamlphp');
-
-  // Make sure we know where SimpleSAMLphp is.
-  if (!file_exists($basedir)) {
-    $failure = t('SimpleSAMLphp could not be found at %basedir . The simplesamlphp_auth module cannot function until the path to the local SimpleSAMLphp instance is configured.', array('%basedir' => $basedir));
-
-    watchdog('simplesamlphp_auth', $failure, NULL, WATCHDOG_WARNING);
-
-    if ($user->uid != 0) {
-      drupal_set_message($failure);
-    }
-
-    // Exit without initializing.
-    return;
-  }
 
   require_once($basedir . '/lib/_autoload.php');
 
@@ -384,6 +375,12 @@ function simplesamlphp_auth_settings() {
   }
 
   $form = array(
+    'simplesamlphp_auth_activate' => array(
+      '#type' => 'checkbox',
+      '#title' => t('Activate authentication via SimpleSAMLphp'),
+      '#default_value' => variable_get('simplesamlphp_auth_enable', FALSE),
+      '#description' => t('Checking this box before configuring the module could lock you out of Drupal.'),
+    ),
     'simplesamlphp_auth_installdir' => array(
       '#type' => 'textfield',
       '#title' => t('Installation directory (default: /var/simplesamlphp)'),
@@ -503,6 +500,56 @@ function simplesamlphp_auth_block_info() {
 }
 
 // Helper functions --------------------------------------
+
+/**
+ * Checks to see if authentication via SimpleSAMLphp should be activated
+ *
+ * @return
+ *   TRUE/FALSE
+ */
+function _simplesamlphp_auth_isEnabled() {
+  GLOBAL $user;
+
+  $failure = NULL;
+  $isActivated = variable_get('simplesamlphp_auth_activate');
+  $basedir     = variable_get('simplesamlphp_auth_installdir', '/var/simplesamlphp');
+
+  if (!$isActivated) {
+    $adminPath = array_keys(simplesamlphp_auth_admin_paths());
+    $failure = t('SimpleSAMLphp authentication is NOT yet activated. It can be activated on the ' . l('configuration page', $adminPath[0]) . '.');
+
+    watchdog('simplesamlphp_auth', $failure, NULL, WATCHDOG_WARNING);
+
+    if ($user->uid != 0) {
+      drupal_set_message($failure);
+    }
+
+  }
+  else {
+
+    // Make sure we know where SimpleSAMLphp is.
+    if (!file_exists($basedir)) {
+      $failure = t('SimpleSAMLphp could not be found at %basedir . The simplesamlphp_auth module cannot function until the path to the local SimpleSAMLphp instance is configured.', array('%basedir' => $basedir));
+
+      watchdog('simplesamlphp_auth', $failure, NULL, WATCHDOG_WARNING);
+
+      if ($user->uid != 0) {
+        drupal_set_message($failure);
+      }
+    }
+
+
+
+  }
+
+  // If there were no failures, then it should be activated
+  if (!$failure) {
+    return TRUE;
+  }
+
+  return FALSE;
+
+}
 
 /**
  * Gets the authname attribute from the SAML assertion.

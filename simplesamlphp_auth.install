@@ -47,6 +47,7 @@ function simplesamlphp_auth_uninstall() {
   variable_del('simplesamlphp_auth_user_register_original');
 
   // Remove the created system variables.
+  variable_del('simplesamlphp_auth_activate');
   variable_del('simplesamlphp_auth_installdir');
   variable_del('simplesamlphp_auth_logout_page');
   variable_del('simplesamlphp_auth_mailattr');
