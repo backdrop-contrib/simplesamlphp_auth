@@ -232,7 +232,7 @@ function simplesamlphp_auth_init() {
   else {
     // The user is already logged into Drupal.
     // If we forbid users from logging in using local accounts.
-    if (false == variable_get('simplesamlphp_auth_allowdefaultlogin', '')) {
+    if (FALSE == variable_get('simplesamlphp_auth_allowdefaultlogin', TRUE)) {
       // If the user has NOT been authenticated via simpleSAML...
       if (!$_simplesamlphp_auth_as->isAuthenticated()) {
         // :FYI: Until Drupal issue #754560 is corrected this message will never be seen by the user.
@@ -246,7 +246,7 @@ function simplesamlphp_auth_init() {
       // If the user has NOT been authenticated via simpleSAML.
       if (!$_simplesamlphp_auth_as->isAuthenticated()) {
         // See if we limit this privilege to specified users
-        $strAllwDefLogUsers = variable_get('simplesamlphp_auth_allowdefaultloginusers', '');
+        $strAllwDefLogUsers = variable_get('simplesamlphp_auth_allowdefaultloginusers', '1');
         $arrAllwDefLogUsers = array();
 
         // If user IDs are specified, we let them in, but everyone else gets logged out.
@@ -446,7 +446,7 @@ function simplesamlphp_auth_settings() {
     'simplesamlphp_auth_allowdefaultloginusers' => array(
       '#type' => 'textfield',
       '#title' => t('Which users should be allowed to login with local accounts?'),
-      '#default_value' => variable_get('simplesamlphp_auth_allowdefaultloginusers', ''),
+      '#default_value' => variable_get('simplesamlphp_auth_allowdefaultloginusers', '1'),
       '#description' => t('Example: <i>1,2,3</i><br />A comma-separated list of user IDs that should be allowed to login without simpleSAMLphp.'),
     ),
   );
