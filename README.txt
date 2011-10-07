@@ -13,13 +13,16 @@ identity attribute values.
    support. For more information on installing and configuring SimpleSAMLphp as
    an SP visit: http://www.simplesamlphp.org.
 
-   IMPORTANT: Your SP must be configured to use memcache for session storage
-   (in config/config.php set store.type => 'memcache').
+   IMPORTANT: Your SP must be configured to use something other than phpsession
+   for session storage (in config/config.php set store.type => 'memcache' or 'sql').
 
-2) You must have memcached installed on your server and PHP must have the
-   memcache extension. For more information on installing the memcache
-   extension for PHP visit:
+   To use memcache session handling you must have memcached installed on your
+   server and PHP must have the memcache extension. For more information on
+   installing the memcache extension for PHP visit:
    http://www.php.net/manual/en/memcache.installation.php
+
+   If you are on a shared host or a machine that you cannot install memcache on
+   then consider using the sql handler (store.type => 'sql').
 
 
 -- INSTALLATION --
@@ -44,7 +47,7 @@ module in order to map them into Drupal.
 -- TROUBLESHOOTING --
 
 The most common reason for things not working is the SP session storage type
-not being set to memcache.
+is still set to phpsession.
 
 
 -- CONTACT --
