@@ -561,7 +561,7 @@ function _simplesamlphp_auth_isEnabled($bShowInactiveMsg=FALSE) {
   else {
 
     // communicate but don't be too annoying
-    if ( $bShowInactiveMsg && (1 == $user->uid || user_access('access administration pages')) && ( preg_match('/admin\/people/', $_SERVER['REQUEST_URI']) || preg_match('/admin\/modules/', $_SERVER['REQUEST_URI']) || preg_match('/admin\/config/', $_SERVER['REQUEST_URI']) ) ) {
+    if ( $bShowInactiveMsg && (1 == $user->uid || user_access('access administration pages')) && ( preg_match('/admin\/people/', request_uri()) || preg_match('/admin\/modules/', request_uri()) || preg_match('/admin\/config/', request_uri()) ) ) {
         drupal_set_message($failure);
     }
   }
