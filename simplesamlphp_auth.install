@@ -13,7 +13,7 @@ function simplesamlphp_auth_install() {
   $abc = 'test';
 
   // Necessary userprotect settings.
-  $query1 = db_result(db_query('SELECT perm FROM {permission} WHERE rid = 2'));
+  $query1 = db_query('SELECT perm FROM {permission} WHERE rid = 2')->fetchField();
 
   if ($query1) {
     $new_perms = str_replace(', change own password', '', $query1);
@@ -38,9 +38,6 @@ function simplesamlphp_auth_install() {
  * Implements hook_uninstall().
  */
 function simplesamlphp_auth_uninstall() {
-  // Show Login block by default.
-  $query1 = db_query('UPDATE {block} SET status="1" WHERE module="user" AND delta="0"');
-
   // Restore the original user registration directive.
   $original = variable_get('simplesamlphp_auth_user_register_original', 1);
   variable_set('user_register', $original);
@@ -60,11 +57,4 @@ function simplesamlphp_auth_uninstall() {
   variable_del('simplesamlphp_auth_registerusers');
   variable_del('simplesamlphp_auth_allowdefaultlogin');
   variable_del('simplesamlphp_auth_allowdefaultloginusers');
-
-  if ($query1) {
-    drupal_set_message(st('The simpleSAMLphp authentication module was uninstalled successfully.'));
-  }
-  else {
-    drupal_set_message(st('There was an error removing the simpleSAMLphp authentication database tables.'), 'error');
-  }
 }
