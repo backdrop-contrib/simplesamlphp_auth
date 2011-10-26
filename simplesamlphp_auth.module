@@ -98,6 +98,7 @@ function simplesamlphp_auth_loginpage() {
   if (!_simplesamlphp_auth_isEnabled()) {
     // Exit without initializing.
     drupal_set_message(t('We\'re sorry this feature is not yet enabled.'));
+    drupal_goto('user');
     return;
   }
 
@@ -145,7 +146,7 @@ function simplesamlphp_auth_init() {
   global $_simplesamlphp_auth_saml_config;
   global $_simplesamlphp_auth_saml_version;
 
-  if (!_simplesamlphp_auth_isEnabled()) {
+  if (!_simplesamlphp_auth_isEnabled(TRUE)) {
     // Exit without initializing.
     return;
   }
@@ -464,6 +465,11 @@ function simplesamlphp_auth_settings() {
  * Implements hook_form_alter().
  */
 function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
+  if (!_simplesamlphp_auth_isEnabled()) {
+    // Exit without executing.
+    return;
+  }
+
   if ($form_id == 'user_login_block') {
     $link =  l('Federated Log In', 'saml_login');
     $links = $form['links']['#markup'];
@@ -483,6 +489,12 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
  * Implements hook_block_view().
  */
 function simplesamlphp_auth_block_view($delta = '') {
+
+  if (!_simplesamlphp_auth_isEnabled()) {
+    // Exit without executing.
+    return;
+  }
+
   switch ($delta) {
     case 0:
       $block = array('subject' => t('simpleSAMLphp login'),
@@ -510,10 +522,13 @@ function simplesamlphp_auth_block_info() {
 /**
  * Checks to see if authentication via SimpleSAMLphp should be activated
  *
+ * @param bShowInactiveMsg
+ *   Whether to display the "module not activated" message
+ *
  * @return
  *   TRUE/FALSE
  */
-function _simplesamlphp_auth_isEnabled() {
+function _simplesamlphp_auth_isEnabled($bShowInactiveMsg=FALSE) {
   GLOBAL $user;
 
   $failure = NULL;
@@ -526,10 +541,6 @@ function _simplesamlphp_auth_isEnabled() {
 
     watchdog('simplesamlphp_auth', $failure, NULL, WATCHDOG_WARNING);
 
-    if ($user->uid != 0) {
-      drupal_set_message($failure);
-    }
-
   }
   else {
 
@@ -539,18 +550,20 @@ function _simplesamlphp_auth_isEnabled() {
 
       watchdog('simplesamlphp_auth', $failure, NULL, WATCHDOG_WARNING);
 
-      if ($user->uid != 0) {
-        drupal_set_message($failure);
-      }
     }
-
-
 
   }
 
   // If there were no failures, then it should be activated
   if (!$failure) {
     return TRUE;
+  }
+  else {
+
+    // communicate but don't be too annoying
+    if ( $bShowInactiveMsg && (1 == $user->uid || user_access('access administration pages')) && ( preg_match('/admin\/people/', $_SERVER['REQUEST_URI']) || preg_match('/admin\/modules/', $_SERVER['REQUEST_URI']) || preg_match('/admin\/config/', $_SERVER['REQUEST_URI']) ) ) {
+        drupal_set_message($failure);
+    }
   }
 
   return FALSE;
@@ -646,6 +659,11 @@ function _simplesamlphp_auth_generate_block_text() {
   global $_simplesamlphp_auth_as;
   $block_content = '';
   global $user;
+
+  if (!_simplesamlphp_auth_isEnabled()) {
+    // Exit without executing.
+    return;
+  }
 
   // Check if valid local session exists..
   if ($_simplesamlphp_auth_as->isAuthenticated()) {
