@@ -252,25 +252,37 @@ function simplesamlphp_auth_init() {
       // If we are allowing users to log in with local accounts.
       // If the user has NOT been authenticated via simpleSAML.
       if (!$_simplesamlphp_auth_as->isAuthenticated()) {
+
         // See if we limit this privilege to specified users
         $strAllwDefLogUsers = variable_get('simplesamlphp_auth_allowdefaultloginusers', '');
         $arrAllwDefLogUsers = array();
+        // See if we limit this privilege to specified roles.
+        $strAllwDefLogRoles = variable_get('simplesamlphp_auth_allowdefaultloginroles', '');
+        $arrAllwDefLogRoles = array();
 
-        // If user IDs are specified, we let them in, but everyone else gets logged out.
-        if (drupal_strlen($strAllwDefLogUsers)) {
-          // @todo Perform a test to make sure that only numbers, spaces, or commas are in the string.
+        // If user IDs or roles are specified, we let them in, but everyone else gets logged out.
+        if (drupal_strlen($strAllwDefLogUsers) || drupal_strlen($strAllwDefLogRoles)) {
+
           // Convert the string into an array.
+          // @todo Perform a test to make sure that only numbers, spaces, or commas are in the string.
           $arrAllwDefLogUsers = explode(',', $strAllwDefLogUsers);
+          $arrAllwDefLogRoles = explode(',', $strAllwDefLogRoles);
 
-          // If we still have something to work with...
-          if (0 < count($arrAllwDefLogUsers)) {
-            // Log the user out of Drupal if the current user's uid is NOT in the list of allowed uids.
-            if (!in_array($user->uid, $arrAllwDefLogUsers)) {
+          // If we still have something to work with.
+          if (0 < count($arrAllwDefLogUsers) || 0 < count($arrAllwDefLogRoles)) {
+            /* Log the user out of Drupal if:
+               1) the current user's uid is NOT in the list of allowed uids...
+               2) or their role does not match and allowed mixed mode role. */
+            $matchRoles = array_intersect(array_keys($user->roles), $arrAllwDefLogRoles);
+            if (!in_array($user->uid, $arrAllwDefLogUsers) && count($matchRoles) == 0) {
               // User is logged into Drupal, but may not be logged into simpleSAML.
               // If this is the case we're supposed to log the user out of Drupal.
 
               // :FYI: Until Drupal issue #754560 is corrected this message will never be seen by the user.
               drupal_set_message(t("We are sorry, you are not permitted to log in using a local account."));
+
+              // The least we can do is write something to the watchdog so someone will know what's happening.
+              watchdog('simplesamlphp_auth', 'User %name not authorized to log in using local account.', array('%name' => $user->name));
 
               _simplesamlphp_auth_destroy_drupal_session();
             }
@@ -449,22 +461,36 @@ function simplesamlphp_auth_settings() {
     '#description' => t('NOTE: This means users could loose any roles that have been assigned manually in Drupal.'),
   );
 
+  $form['simplesamlphp_auth_grp_reg'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('User Provisioning'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['simplesamlphp_auth_grp_reg']['simplesamlphp_auth_registerusers'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Register users (i.e., auto-provisioning)'),
+    '#default_value' => variable_get('simplesamlphp_auth_registerusers', TRUE),
+    '#description' => t('Determines wether or not the module should automatically create/register new Drupal accounts for users that authenticate using SimpleSAMLphp. Unless you\'ve done some custom work to provision Drupal accounts with the necessary authmap entries you will want this checked.<br /><br />NOTE: If unchecked each user must already have been provisioned a Drupal account with an appropriate entry in the authmap table before logging in. Otherwise they will receive a notice and be denied access. Be aware that simply creating a Drupal account will not create the necessary entry in the authmap table.'),
+  );
+
   $form['simplesamlphp_auth_grp_auth'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Auth and Registration'),
-    '#collapsible' => FALSE, 
-  );
-  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_registerusers'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Register users'),
-    '#default_value' => variable_get('simplesamlphp_auth_registerusers', TRUE),
-    '#description' => t('Decides wether or not the module should create/register new users upon authentication.<br />NOTE: If unchecked each user must already have been provisioned a Drupal account before logging in. Otherwise they will receive a notice and be denied access.'),
+    '#title' => t('Drupal Authentication'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
   );
   $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowdefaultlogin'] = array(
     '#type' => 'checkbox',
     '#title' => t('Allow authentication with local Drupal accounts'),
     '#default_value' => variable_get('simplesamlphp_auth_allowdefaultlogin', TRUE),
     '#description' => t('Check this box if you want to let people log in with local Drupal accounts (without using simpleSAMLphp). If you want to restrict this privilege to certain users you can enter the Drupal user IDs in the next field.'),
+  );
+  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowdefaultloginroles'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Which ROLES should be allowed to login with local accounts?'),
+      '#default_value' => variable_get('simplesamlphp_auth_allowdefaultloginroles', ''),
+      '#description' => t('Example: <i>1,2,3</i><br />A comma-separated list of role IDs that should be allowed to login without simpleSAMLphp.'),
   );
   $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowdefaultloginusers'] = array(
     '#type' => 'textfield',
