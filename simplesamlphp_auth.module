@@ -35,7 +35,7 @@ function simplesamlphp_auth_menu() {
   $items = array();
 
   $items['admin/config/people/simplesamlphp_auth'] = array(
-    'title' => 'simpleSAMLphp authentication module settings',
+    'title' => 'SimpleSAMLphp Auth Settings',
     'description' => 'Control the various settings of the simpleSAMLphp authentication module',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('simplesamlphp_auth_settings'),
