@@ -195,16 +195,14 @@ function simplesamlphp_auth_init() {
               $user = user_save($user, $userinfo); // @todo - Fjernet rolle-delen her da den gav en bra feilmelding når roller ikke finnes ;)
             }
 
-            drupal_set_message(t("Welcome. Since this is your first time logging in, we've automatically provisioned an account for you."), 'status');
-
-            }
-            else {
-              // We are not allowed to register new users on the site through simpleSAML.
-              // We let the user know about this and redirect to the user/login page.
-              $msg = t("We are sorry. While you have successfully authenticated, you are not yet entitled to access this site. Please ask the site administrator to provision access for you.");
-              drupal_set_message($msg);
-              $_simplesamlphp_auth_as->logout('/?msg=' . $msg);
-            }
+          }
+          else {
+            // We are not allowed to register new users on the site through simpleSAML.
+            // We let the user know about this and redirect to the user/login page.
+            $msg = t("We are sorry. While you have successfully authenticated, you are not yet entitled to access this site. Please ask the site administrator to provision access for you.");
+            drupal_set_message($msg);
+            $_simplesamlphp_auth_as->logout('/?msg=' . $msg);
+          }
         }
         else {
           // If successfully logged into Drupal.
@@ -226,8 +224,10 @@ function simplesamlphp_auth_init() {
             $user = $ext_user;
           }
 
-          $msg = t("Welcome back.");
-          drupal_set_message($msg, 'status');
+          if (module_exists('rules')) {
+            rules_invoke_event('simplesamlphp_auth_rules_event_login', $user);
+          }
+
         }
           // Finalizing the login, calls hook_user op login.
           $edit = array();
@@ -284,7 +284,9 @@ function simplesamlphp_auth_init() {
               _simplesamlphp_auth_destroy_drupal_session();
             }
           }
+          
         } // Test for specified users.
+        
       } // End if $_simplesamlphp_auth_as->isAuthenticated().
     } // End test to see if we allow default logins.
   } // End if user->uid.
@@ -333,6 +335,10 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
           ->fields(array('mail' => $mail_address))
           ->condition('uid', $account->uid)
           ->execute();
+      }
+      
+      if (module_exists('rules')) {
+        rules_invoke_event('simplesamlphp_auth_rules_event_register', $account); 
       }
 
       _simplesaml_auth_debug(t('Updating mail [%mailaddr]', array('%mailaddr' => $mail_address)));
