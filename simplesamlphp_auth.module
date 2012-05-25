@@ -98,8 +98,7 @@ function simplesamlphp_auth_loginpage() {
   if (!_simplesamlphp_auth_isEnabled()) {
     // Exit without initializing.
     drupal_set_message(t('We\'re sorry this feature is not yet enabled.'));
-    drupal_goto('user');
-    return;
+    return '';
   }
 
   // Do some sanity checking before attempting anything.
@@ -124,7 +123,7 @@ function simplesamlphp_auth_loginpage() {
     drupal_goto('/');
   }
 
-  if ($user->uid == 0 ) {
+  if ($user->uid == 0) {
     // Require the user to be authenticated.
     $_simplesamlphp_auth_as->requireAuth();
 
