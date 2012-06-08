@@ -123,31 +123,36 @@ function simplesamlphp_auth_loginpage() {
     drupal_goto('/');
   }
 
-  $_simplesamlphp_auth_authparms = NULL;
+
+  $authparms = NULL;
 
   // Support for deep linking.
 
-  // See if a URL has been provided in ReturnTo.
-  if ((isset($_REQUEST['ReturnTo']) && $_REQUEST['ReturnTo']) && valid_url($_REQUEST['ReturnTo'])) {
-    // we'll only use the REFERER if it points to this Drupal site.
-    if (preg_match(base_path(), $_REQUEST['ReturnTo'])) {
-      $_simplesamlphp_auth_authparms = array('ReturnTo' => $_REQUEST['ReturnTo']);
-    }
-  }
-  // See if a REFERER URL is available.
-  elseif ((isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER']) && valid_url($_SERVER['HTTP_REFERER'])) {
-    // we'll only use the REFERER if it points to this Drupal site.
-    if (preg_match(base_path(), $_SERVER['HTTP_REFERER'])) {
-      $_simplesamlphp_auth_authparms = array('ReturnTo' => $_SERVER['HTTP_REFERER']);
-    }
-  }
+  // See if a URL has been explicitly provided in ReturnTo. If so, use it (as long as it points to this site).
+  if ((isset($_REQUEST['ReturnTo']) && $_REQUEST['ReturnTo']) &&
+      (valid_url($_REQUEST['ReturnTo']) && stripos($_REQUEST['ReturnTo'], $_SERVER['SERVER_NAME']))) {
 
+      $authparms = array('ReturnTo' => $_REQUEST['ReturnTo']);
+
+  // If not, see if a REFERER URL is available. If so, use it (as long as it points to this site).
+  }
+  elseif ((isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER']) &&
+          (valid_url($_SERVER['HTTP_REFERER']) && stripos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']))) {
+
+      $authparms = array('ReturnTo' => $_SERVER['HTTP_REFERER']);
+
+  }
 
   if ($user->uid == 0) {
-    // Require the user to be authentcated.
 
-    if (is_array($_simplesamlphp_auth_authparms)) {
-      $_simplesamlphp_auth_as->requireAuth($_simplesamlphp_auth_authparms);
+    // Just so we're not tripped up by other redirections, let's set a cookie.
+    if (isset($authparms['ReturnTo']) && $authparms['ReturnTo']) {
+      setrawcookie('simplesamlphp_auth_returnto', $authparms['ReturnTo'], time()+60*60);
+    }
+
+    // Require the user to be authentcated.
+    if (is_array($authparms)) {
+      $_simplesamlphp_auth_as->requireAuth($authparms);
     }
     else {
       $_simplesamlphp_auth_as->requireAuth();
@@ -156,10 +161,35 @@ function simplesamlphp_auth_loginpage() {
   }
   else {
 
-    // See if a ReturnTo has been set.
-    if (isset($_simplesamlphp_auth_authparms['ReturnTo']) && $_simplesamlphp_auth_authparms['ReturnTo']) {
+
+    /* We'll only ever be in this section in certain cases:
+     * 1) an authenticated user clicks /saml_login again somehow
+     * 2) an authenticated user is sent back here (because ReturnTo was blank when requireAuth() called)
+     */
+
+    // Some special handling if an authenticated user is sent here.
+
+    $returnto = NULL;
+
+    // Check to see if there is a cookie. If there is one, give it priority.
+    if (isset($_COOKIE['simplesamlphp_auth_returnto']) && $_COOKIE['simplesamlphp_auth_returnto']) {
+      // use the cookie for the ReturnTo
+      $returnto = $_COOKIE['simplesamlphp_auth_returnto'];
+
+      // unset the cookie
+      setrawcookie('simplesamlphp_auth_returnto', '');
+
+    // If not, see if we've set ReturnTo.
+    }
+    elseif (isset($authparms['ReturnTo']) && $authparms['ReturnTo']) {
+      $returnto = $authparms['ReturnTo'];
+    }
+
+
+    // If a ReturnTo has been set.
+    if ($returnto) {
       // Using header() here feels like a kuldge. Drupal might have a more appropriate way to do this, but there is the possibility that the ReturnTo URL might be outside of the Drupal site.
-      header('Location: ' . $_simplesamlphp_auth_authparms['ReturnTo']);
+      header('Location: ' . $returnto);
     }
     else {
       drupal_goto('user/' . $user->uid);
