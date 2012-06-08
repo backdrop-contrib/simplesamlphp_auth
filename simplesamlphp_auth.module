@@ -265,7 +265,7 @@ function simplesamlphp_auth_init() {
             // We are not allowed to register new users on the site through simpleSAML.
             // We let the user know about this and redirect to the user/login page.
             $msg = t("We are sorry. While you have successfully authenticated, you are not yet entitled to access this site. Please ask the site administrator to provision access for you.");
-            drupal_set_message($msg);
+            drupal_set_message(check_plain($msg));
             $_simplesamlphp_auth_as->logout('/?msg=' . $msg);
           }
         }
@@ -374,7 +374,7 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
       }
       catch (Exception $e) {
         $message = t('Username is missing.' . $e->getMessage());
-        drupal_set_message($message, "error");
+        drupal_set_message(check_plain($message), "error");
         watchdog('simplesamlphp', $message, WATCHDOG_CRITICAL);
       }
 
