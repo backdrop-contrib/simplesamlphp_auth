@@ -357,19 +357,11 @@ function simplesamlphp_auth_user_logout($account) {
   if (!empty($_simplesamlphp_auth_saml_attributes)) {
 
     $config = SimpleSAML_Configuration::getInstance();
-    $msg = 'with_slo';
-
-    try {
-      $slo = $config->getString('SingleLogoutService');
-    }
-    catch (Exception $e) {
-      $msg = "no_slo";
-    }
 
     // :KLUDGE: for some reason Drupal is not killing the session, even if I were to call drupal_session_destroy_uid() here.
     session_destroy();
 
-    $_simplesamlphp_auth_as->logout('/?msg=' . $msg);
+    $_simplesamlphp_auth_as->logout(base_path());
   }
 }
 
