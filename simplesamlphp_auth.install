@@ -10,28 +10,13 @@
  */
 function simplesamlphp_auth_install() {
 
-  $abc = 'test';
-
-  // Necessary userprotect settings.
-  $query1 = db_query('SELECT perm FROM {permission} WHERE rid = 2')->fetchField();
-
-  if ($query1) {
-    $new_perms = str_replace(', change own password', '', $query1);
-    $new_perms = str_replace('change own password', '', $new_perms);
-    $query2 = db_query('UPDATE {permission} SET perm = "' . $new_perms . '" WHERE rid = 2');
-  }
+  user_role_revoke_permissions(DRUPAL_AUTHENTICATED_RID, array('change own password'));
 
   // Disable the open registration to the site and store the original setting.
   $original = variable_get('user_register', 1);
   variable_set('user_register', 0);
   variable_set('simplesamlphp_auth_user_register_original', $original);
 
-  if ($query1) {
-    drupal_set_message(st('The simpleSAMLphp authentication module was installed successfully.'));
-  }
-  else {
-    drupal_set_message(st('There was an error installing the simpleSAMLphp authentication database tables.'), 'error');
-  }
 }
 
 /**
