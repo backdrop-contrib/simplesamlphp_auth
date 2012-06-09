@@ -253,7 +253,7 @@ function simplesamlphp_auth_init() {
             // We let the user know about this and redirect to the user/login page.
             $msg = t("We are sorry. While you have successfully authenticated, you are not yet entitled to access this site. Please ask the site administrator to provision access for you.");
             drupal_set_message(check_plain($msg));
-            $_simplesamlphp_auth_as->logout('/?msg=' . $msg);
+            $_simplesamlphp_auth_as->logout(base_path());
           }
         }
         else {
