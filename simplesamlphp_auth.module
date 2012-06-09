@@ -536,6 +536,12 @@ function simplesamlphp_auth_settings() {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
+  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowsetdrupalpwd'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow SAML users to set Drupal passwords.'),
+    '#default_value' => variable_get('simplesamlphp_auth_allowsetdrupalpwd', FALSE),
+    '#description' => t('Check this box if you want to let people set passwords for their local Drupal accounts. This will allow users to log in using either SAML or a local Drupal account. Disabling this removes the password change fields from the user profile form.<br/>NOTE: In order for them to login using their local Drupal password you must allow local logins with the settings below.'),
+  );
   $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowdefaultlogin'] = array(
     '#type' => 'checkbox',
     '#title' => t('Allow authentication with local Drupal accounts'),
@@ -582,6 +588,21 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
     $links = $form['links']['#markup'];
     $links = str_replace('</ul>', '<li class="saml">' . $link . '</li></ul>', $links);
     $form['links']['#markup'] = $links;
+  }
+
+  // If the user has a simplesamlphp_auth authmap record, then don't require them to know their Drupal password.
+  // This will allow them to change their e-mail address, and set a Drupal password if they want to (and are allowed).
+  if ((isset($form['#user']->init) && $form['#user']->init) && (_simplesaml_auth_user_has_authmap($form['#user']->init) && $form_id == 'user_profile_form')) {
+
+    unset($form['account']['current_pass']);
+    unset($form['account']['current_pass_required_values']);
+    $form['#validate'] = array_diff($form['#validate'], array('user_validate_current_pass'));
+
+    // If the user is a simplesamlphp_auth user and is NOT allowed to set their Drupal password, remove the fields from the form.
+    if (!variable_get('simplesamlphp_auth_allowsetdrupalpwd')) {
+      unset($form['account']['pass']);
+    }
+
   }
 }
 
@@ -862,6 +883,22 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
     }
   }
   return $roles;
+}
+
+/**
+ * See if the user has an authmap record for simplesamlphp_auth
+ */
+function _simplesaml_auth_user_has_authmap($authname) {
+  $authmaps = user_get_authmaps($authname);
+
+  $return = 0;
+
+  if (is_array($authmaps)) {
+    $return = in_array('simplesamlphp_auth', array_keys($authmaps));
+  }
+
+  return $return;
+
 }
 
 /**
