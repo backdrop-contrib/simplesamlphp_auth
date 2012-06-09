@@ -353,6 +353,11 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
   global $_simplesamlphp_auth_as;
   global $_simplesamlphp_auth_saml_attributes;
 
+  if (!_simplesamlphp_auth_isEnabled()) {
+    // Exit without initializing.
+    return;
+  }
+
   if ($category = 'account') {
     // If user registration has a valid session...
     if ($_simplesamlphp_auth_as->isAuthenticated()) {
