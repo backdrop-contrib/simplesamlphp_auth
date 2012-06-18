@@ -412,6 +412,7 @@ function simplesamlphp_auth_user_logout($account) {
   global $user;
   global $_simplesamlphp_auth_as;
   global $_simplesamlphp_auth_saml_attributes;
+  global $base_url;
 
   if (!empty($_simplesamlphp_auth_saml_attributes)) {
 
@@ -420,7 +421,13 @@ function simplesamlphp_auth_user_logout($account) {
     // :KLUDGE: for some reason Drupal is not killing the session, even if I were to call drupal_session_destroy_uid() here.
     session_destroy();
 
-    $_simplesamlphp_auth_as->logout(base_path());
+    $gotourl = base_path();
+    if (variable_get('simplesamlphp_auth_logoutgotourl', '')) {
+      $gotourl = variable_get('simplesamlphp_auth_logoutgotourl', '');
+    }
+
+    $_simplesamlphp_auth_as->logout($gotourl);
+
   }
 }
 
@@ -438,7 +445,7 @@ function simplesamlphp_auth_user_delete($account) {
  * Implements settings for the module.
  */
 function simplesamlphp_auth_settings() {
-  global $_simplesamlphp_auth_saml_version;
+  global $_simplesamlphp_auth_saml_version, $base_url;
 
   if (!empty($_simplesamlphp_auth_saml_version )) {
     $ver = explode('.', $_simplesamlphp_auth_saml_version);
@@ -562,6 +569,12 @@ function simplesamlphp_auth_settings() {
     '#title' => t('Which users should be allowed to login with local accounts?'),
     '#default_value' => variable_get('simplesamlphp_auth_allowdefaultloginusers', ''),
     '#description' => t('Example: <i>1,2,3</i><br />A comma-separated list of user IDs that should be allowed to login without simpleSAMLphp.'),
+  );
+  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_logoutgotourl'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Optionally, specify a URL for users to go to after logging out'),
+    '#default_value' => variable_get('simplesamlphp_auth_logoutgotourl', ''),
+    '#description' => t('Example: ' . $base_url),
   );
 
   return system_settings_form($form);
