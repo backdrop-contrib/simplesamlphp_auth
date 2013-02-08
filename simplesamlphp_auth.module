@@ -742,7 +742,9 @@ function _simplesamlphp_auth_get_default_name($account) {
   // Check if valid local session exists..
   if ($_simplesamlphp_auth_as->isAuthenticated() ) {
     $auth_user_name_attr = variable_get('simplesamlphp_auth_user_name', 'eduPersonPrincipalName');
-    if (!isset($_simplesamlphp_auth_saml_attributes[$auth_user_name_attr]) || !isset($_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0])) {
+    if ((!isset($_simplesamlphp_auth_saml_attributes[$auth_user_name_attr])) ||
+        (!isset($_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0])) ||
+        ($_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0] == '')) {
       throw new Exception(t('There was no attribute named %auth_user_name_attr set for your user.', array('%auth_user_name_attr' => $auth_user_name_attr)));
     }
     $default_name = $_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0];
