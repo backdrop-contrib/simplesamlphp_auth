@@ -384,9 +384,8 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
         $mail_address = _simplesamlphp_auth_get_mail();
       }
       catch (Exception $e)  {
-        $message = t('Email is missing.' . $e->getMessage());
-        drupal_set_message($message, "error");
-        watchdog('simplesamlphp', $message, WATCHDOG_CRITICAL);
+        drupal_set_message(t('Your e-mail address was not provided by your identity provider (IDP).'), "error");
+        watchdog('simplesamlphp_auth', $e->getMessage(), WATCHDOG_CRITICAL);
       }
 
       if (!empty($mail_address)) {
@@ -767,7 +766,7 @@ function _simplesamlphp_auth_get_mail() {
       $mail_address = $_simplesamlphp_auth_saml_attributes[variable_get('simplesamlphp_auth_mailattr', 'mail')][0];
     }
     else {
-      throw new Exception(t('error in simplesamlphp_auth.module: no valid mail attribute set'));
+      throw new Exception(t('Error in simplesamlphp_auth.module: No valid mail attribute set.'));
     }
   }
 
