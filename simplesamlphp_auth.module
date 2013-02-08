@@ -367,9 +367,8 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
         $account->name = _simplesamlphp_auth_get_default_name($account->uid);
       }
       catch (Exception $e) {
-        $message = t('Username is missing.' . $e->getMessage());
-        drupal_set_message(check_plain($message), "error");
-        watchdog('simplesamlphp', $message, WATCHDOG_CRITICAL);
+        drupal_set_message(t('Your user name was not provided by your identity provider (IDP).'), "error");
+        watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
       }
 
       db_update('users')
@@ -385,7 +384,7 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
       }
       catch (Exception $e)  {
         drupal_set_message(t('Your e-mail address was not provided by your identity provider (IDP).'), "error");
-        watchdog('simplesamlphp_auth', $e->getMessage(), WATCHDOG_CRITICAL);
+        watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
       }
 
       if (!empty($mail_address)) {
@@ -745,7 +744,11 @@ function _simplesamlphp_auth_get_default_name($account) {
     if ((!isset($_simplesamlphp_auth_saml_attributes[$auth_user_name_attr])) ||
         (!isset($_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0])) ||
         ($_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0] == '')) {
-      throw new Exception(t('There was no attribute named %auth_user_name_attr set for your user.', array('%auth_user_name_attr' => $auth_user_name_attr)));
+      throw new Exception(t('There was no set attribute named "%auth_user_name_attr" returned for user %uid.',
+        array(
+          '%auth_user_name_attr' => $auth_user_name_attr,
+          '%uid' => $account,
+        )));
     }
     $default_name = $_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0];
   }
