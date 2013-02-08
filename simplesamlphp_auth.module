@@ -553,7 +553,7 @@ function simplesamlphp_auth_settings() {
     '#type' => 'checkbox',
     '#title' => t('Allow authentication with local Drupal accounts'),
     '#default_value' => variable_get('simplesamlphp_auth_allowdefaultlogin', TRUE),
-    '#description' => t('Check this box if you want to let people log in with local Drupal accounts (without using simpleSAMLphp). If you want to restrict this privilege to certain users you can enter the Drupal user IDs in the next field.'),
+    '#description' => t('Check this box if you want to let people log in with local Drupal accounts (without using simpleSAMLphp). If you want to restrict this privilege to certain users you can enter the Drupal user IDs in the field below.'),
   );
   $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowdefaultloginroles'] = array(
       '#type' => 'select',
@@ -568,7 +568,7 @@ function simplesamlphp_auth_settings() {
     '#type' => 'textfield',
     '#title' => t('Which users should be allowed to login with local accounts?'),
     '#default_value' => variable_get('simplesamlphp_auth_allowdefaultloginusers', ''),
-    '#description' => t('Example: <i>1,2,3</i><br />A comma-separated list of user IDs that should be allowed to login without simpleSAMLphp.'),
+    '#description' => t('Example: <i>1,2,3</i><br />A comma-separated list of user IDs that should be allowed to login without simpleSAMLphp. If left blank, all local accounts can login.'),
   );
   $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_logoutgotourl'] = array(
     '#type' => 'textfield',
