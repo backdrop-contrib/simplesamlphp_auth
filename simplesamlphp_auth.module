@@ -649,7 +649,9 @@ function simplesamlphp_auth_block_info() {
   return $block;
 }
 
-// Helper functions --------------------------------------
+/****************************************************************************
+ * Private functions ********************************************************
+ ****************************************************************************/
 
 /**
  * Checks to see if authentication via SimpleSAMLphp should be activated
@@ -944,3 +946,73 @@ function _simplesamlphp_auth_destroy_drupal_session() {
 
   drupal_goto();
 }
+
+/****************************************************************************
+ * Public functions *********************************************************
+ ****************************************************************************/
+
+/**
+ * Determine if the current user is authenticated through SAML.
+ *
+ * @return
+ *   TRUE if the current user is authenticated through SAML.  FALSE otherwise.
+ */
+function simplesamlphp_auth_is_authenticated() {
+  global $_simplesamlphp_auth_as;
+
+  // Assume that the user isn't authenticated until proven otherwise.
+  $authenticated = FALSE;
+
+  // If the associated global variable exists, and the auth flag is set, note it.
+  if (isset($_simplesamlphp_auth_as) && $_simplesamlphp_auth_as->isAuthenticated()) {
+    $authenticated = TRUE;
+  }
+
+  // Return the result.
+  return $authenticated;
+}
+
+/**
+ * Return any attributes provided by the SAML IDP.
+ *
+ * @param $attribute
+ *   The attribute whose value to return.  Can be skipped if all attribute
+ *   values are requested.
+ *
+ * @return
+ *   If an attribute was provided, the value of the attribute is returned.
+ *   Otherwise, an array of all attribute values is returned, keyed by
+ *   attribute.
+ */
+function simplesamlphp_auth_get_attributes($attribute = NULL) {
+  global $_simplesamlphp_auth_saml_attributes;
+
+  if (isset($attribute)) {
+
+    // Initially, assume that there's nothing to return.
+    $result = NULL;
+
+    // If the specified attribute is set, grab it.
+    if (isset($_simplesamlphp_auth_saml_attributes)) {
+      if (isset($_simplesamlphp_auth_saml_attributes[$attribute])) {
+        $result = $_simplesamlphp_auth_saml_attributes[$attribute];
+      }
+    }
+  }
+
+  // No specific attribute was requested; return all of them.
+  else {
+
+    // Initially, assume that there's nothing to return.
+    $result = array();
+
+    // If the global array exists, return it.
+    if (isset($_simplesamlphp_auth_saml_attributes)) {
+      $result = $_simplesamlphp_auth_saml_attributes;
+    }
+  }
+
+  // Return whatever we've got.`
+  return $result;
+}
+
