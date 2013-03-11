@@ -230,6 +230,7 @@ function simplesamlphp_auth_init() {
 
         // Retrieve user mapping and attempt to log the user in.
         $ext_user = user_external_load($authname);
+        $skip_user_finalization = FALSE;
 
         if (!$ext_user) {
           // First we check the admin settings for simpleSAMLphp and find out if we are allowed to register users.
@@ -239,6 +240,7 @@ function simplesamlphp_auth_init() {
             _simplesaml_auth_debug(t('Register [%authname]', array('%authname' => $authname)));
 
             user_external_login_register($authname, 'simplesamlphp_auth');
+            $skip_user_finalization = TRUE;
 
             if ($user) {
               // Populate roles based on configuration setting.
@@ -282,9 +284,12 @@ function simplesamlphp_auth_init() {
 
         }
 
-          // Finalizing the login, calls hook_user op login.
+        // Finalizing the login, calls hook_user op login.
+        // user_external_login_register() calls this for us.
+        if (!$skip_user_finalization) {
           $edit = array();
           user_login_finalize($edit);
+        }
 
       } // End if !empty authname.
     } // End if isset saml_session.
