@@ -1,14 +1,19 @@
 <?php
 
 /**
+ * @file
+ * Admin include file for admin settings form.
+ */
+
+/**
  * Implements settings for the module.
  */
 function simplesamlphp_auth_settings() {
   global $_simplesamlphp_auth_saml_version, $base_url;
 
-  if (!empty($_simplesamlphp_auth_saml_version )) {
+  if (!empty($_simplesamlphp_auth_saml_version)) {
     $ver = explode('.', $_simplesamlphp_auth_saml_version);
-    if ( !($ver[0] >= 1 && $ver[1] >= 5) ) {
+    if (!($ver[0] >= 1 && $ver[1] >= 5)) {
       drupal_set_message(t("Please upgrade SimpleSAMLphp. You are using %ssp_version", array('%ssp_version' => $_simplesamlphp_auth_saml_version)), 'warning');
     }
   }
@@ -52,7 +57,7 @@ function simplesamlphp_auth_settings() {
   );
   $form['simplesamlphp_auth_grp_user']['simplesamlphp_auth_user_name'] = array(
     '#type' => 'textfield',
-    '#title' => t('Which attribute from simpleSAMLphp should be used as user\'s name'),
+    '#title' => t("Which attribute from simpleSAMLphp should be used as user's name"),
     '#default_value' => variable_get('simplesamlphp_auth_user_name', 'eduPersonPrincipalName'),
     '#description' => t('Example: <i>eduPersonPrincipalName</i> or <i>displayName</i><br />If the attribute is multivalued, the first value will be used.'),
     '#required' => TRUE,
@@ -93,7 +98,7 @@ function simplesamlphp_auth_settings() {
     '#type' => 'checkbox',
     '#title' => t('Register users (i.e., auto-provisioning)'),
     '#default_value' => variable_get('simplesamlphp_auth_registerusers', TRUE),
-    '#description' => t('Determines wether or not the module should automatically create/register new Drupal accounts for users that authenticate using SimpleSAMLphp. Unless you\'ve done some custom work to provision Drupal accounts with the necessary authmap entries you will want this checked.<br /><br />NOTE: If unchecked each user must already have been provisioned a Drupal account with an appropriate entry in the authmap table before logging in. Otherwise they will receive a notice and be denied access. Be aware that simply creating a Drupal account will not create the necessary entry in the authmap table.'),
+    '#description' => t("Determines wether or not the module should automatically create/register new Drupal accounts for users that authenticate using SimpleSAMLphp. Unless you've done some custom work to provision Drupal accounts with the necessary authmap entries you will want this checked. NOTE: If unchecked each user must already have been provisioned a Drupal account with an appropriate entry in the authmap table before logging in. Otherwise they will receive a notice and be denied access. Be aware that simply creating a Drupal account will not create the necessary entry in the authmap table."),
   );
 
   $form['simplesamlphp_auth_grp_auth'] = array(
@@ -133,7 +138,7 @@ function simplesamlphp_auth_settings() {
     '#type' => 'textfield',
     '#title' => t('Optionally, specify a URL for users to go to after logging out'),
     '#default_value' => variable_get('simplesamlphp_auth_logoutgotourl', ''),
-    '#description' => t('Example: ' . $base_url),
+    '#description' => t('Example: @base_url', array('@base_url' => $base_url)),
   );
 
   return system_settings_form($form);
