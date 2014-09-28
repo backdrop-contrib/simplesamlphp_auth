@@ -805,6 +805,8 @@ function _simplesamlphp_auth_destroy_drupal_session() {
 
   // Destroy the current session:
   session_destroy();
+  drupal_save_session(FALSE);
+
   // Only variables can be passed by reference workaround.
   $null = NULL;
   user_module_invoke('logout', $null, $user);
