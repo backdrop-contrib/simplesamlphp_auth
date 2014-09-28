@@ -69,7 +69,7 @@ function simplesamlphp_auth_requirements($phase) {
         'severity'    => REQUIREMENT_WARNING,
         'title'       => 'simpleSAMLphp_auth',
         'value'       => t('SimpleSAMLphp authentication is missing the required SimpleSAMLphp library'),
-        'description' => t('Please download and install the !simplesamlphp library.', array('!simplesamlphp' => l(t('SimpeSAMLphp', 'https://simplesamlphp.org/download')))),
+        'description' => t('Please download and install the !simplesamlphp library.', array('!simplesamlphp' => l(t('SimpeSAMLphp'), 'https://simplesamlphp.org/download'))),
       );
     }
   }
