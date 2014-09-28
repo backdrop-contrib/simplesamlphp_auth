@@ -39,7 +39,7 @@ function simplesamlphp_auth_settings() {
   );
   $form['simplesamlphp_auth_grp_setup']['simplesamlphp_auth_authsource'] = array(
     '#type' => 'textfield',
-    '#title' => t('Autenticaton source for this SP (default: default-sp)'),
+    '#title' => t('Authenticaton source for this SP (default: default-sp)'),
     '#default_value' => variable_get('simplesamlphp_auth_authsource', 'default-sp'),
     '#description' => t('The name of the source to use from /var/simplesamlphp/config/authsources.php'),
   );
