@@ -670,7 +670,8 @@ function _simplesamlphp_auth_generate_block_text() {
 
   // Check if valid local session exists..
   if ($_simplesamlphp_auth_as->isAuthenticated()) {
-    $block_content .= '<p>Logged in as: ' . $user->name . '<br />' . l(t('Log Out'), 'user/logout') . '</a></p>';
+    $block_content .= '<p>' . t('Logged in as: @username', array('@username' => $user->name)) 
+    . '<br />' . l(t('Log Out'), 'user/logout') . '</p>';
   }
   else {
     $block_content .= '<p>' . l(t('Federated Log In'), 'saml_login') . '</p>';
