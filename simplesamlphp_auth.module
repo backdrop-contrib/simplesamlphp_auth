@@ -366,7 +366,7 @@ function simplesamlphp_auth_user_insert(&$edit, $account, $category = NULL) {
     return;
   }
 
-  if ($category = 'account') {
+  if ($category == 'account') {
     // If user registration has a valid session...
     if ($_simplesamlphp_auth_as->isAuthenticated()) {
       // Get name from default attributes.
