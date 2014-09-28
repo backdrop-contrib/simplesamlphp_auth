@@ -196,7 +196,12 @@ function simplesamlphp_auth_init() {
   // Get the simplesamlphp session.
   $basedir = variable_get('simplesamlphp_auth_installdir', '/var/simplesamlphp');
 
-  require_once $basedir . '/lib/_autoload.php';
+  if (file_exists($basedir . '/lib/_autoload.php')) {
+     require_once $basedir . '/lib/_autoload.php';
+  }
+  else {
+    return;
+  }
 
   $_simplesamlphp_auth_saml_config  = SimpleSAML_Configuration::getInstance();
   $_simplesamlphp_auth_saml_version = $_simplesamlphp_auth_saml_config->getVersion();
@@ -534,17 +539,11 @@ function simplesamlphp_auth_block_info() {
 function _simplesamlphp_auth_isEnabled($show_inactive_msg = FALSE) {
   global $user;
 
-  $failure     = NULL;
+  $failure      = NULL;
   $is_activated = variable_get('simplesamlphp_auth_activate');
-  $basedir     = variable_get('simplesamlphp_auth_installdir', '/var/simplesamlphp');
+  $basedir      = variable_get('simplesamlphp_auth_installdir', '/var/simplesamlphp');
 
-  if (!$is_activated) {
-    $admin_path = array_keys(simplesamlphp_auth_admin_paths());
-    $failure   = t('SimpleSAMLphp authentication is NOT yet activated. It can be activated on the @admin_page.', array('@admin_page' => l(t('configuration page'), $admin_path[0])));
-    watchdog('simplesamlphp_auth', $failure, NULL, WATCHDOG_WARNING);
-
-  }
-  else {
+  if ($is_activated) {
     // Make sure we know where SimpleSAMLphp is.
     if (!file_exists($basedir)) {
       $failure = t('SimpleSAMLphp could not be found at %basedir . The simplesamlphp_auth module cannot function until the path to the local SimpleSAMLphp instance is configured.', array('%basedir' => $basedir));
