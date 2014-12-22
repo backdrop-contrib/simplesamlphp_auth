@@ -809,22 +809,8 @@ function _simplesaml_auth_debug($message) {
  * Logged out user that has an active session in Drupal but not with simpleSAML.
  */
 function _simplesamlphp_auth_destroy_drupal_session() {
-  global $user;
-
-  watchdog('user', 'Session closed for %name.', array('%name' => $user->name));
-
-  // Destroy the current session:
-  session_destroy();
-  drupal_save_session(FALSE);
-
-  // Only variables can be passed by reference workaround.
-  $null = NULL;
-  user_module_invoke('logout', $null, $user);
-
-  // Load the anonymous user.
-  $user = drupal_anonymous_user();
-
-  drupal_goto();
+  module_load_include('pages.inc', 'user');
+  user_logout();
 }
 
 /****************************************************************************
