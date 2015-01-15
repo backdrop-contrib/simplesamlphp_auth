@@ -678,7 +678,7 @@ function _simplesamlphp_auth_generate_block_text() {
 
   // Check if valid local session exists..
   if ($_simplesamlphp_auth_as->isAuthenticated()) {
-    $block_content .= '<p>' . t('Logged in as: @username', array('@username' => $user->name)) 
+    $block_content .= '<p>' . t('Logged in as: @username', array('@username' => $user->name))
     . '<br />' . l(t('Log Out'), 'user/logout') . '</p>';
   }
   else {
@@ -690,6 +690,14 @@ function _simplesamlphp_auth_generate_block_text() {
 
 /**
  * Evaluates a role rule.
+ * The rules work as follows:
+ * = does an exact match on an attribute and will iterate over array values if
+ *     the array is multivalued.
+ * @= matches the domain portion of an email address. It assumes the attribute
+ *     is a string, and will not iterate over an array (but take the first value).
+ * ~= does a partial string match on the attribute, and does iterate over multiple
+ *     values, returning true if any of the values match.
+ *
  *
  * @param array $roleruleevaluation
  *   An array containing the role rule to evaluate.
@@ -721,6 +729,15 @@ function _simplesamlphp_auth_evaulaterolerule($roleruleevaluation, $attributes) 
         return FALSE;
       }
       return ($dc[1] == $roleruleevaluation[2]);
+
+    case '~=':
+      foreach ($attribute as $subattr) {
+        $pos = strpos($subattr, $roleruleevaluation[2]);
+        if ($pos !== FALSE) {
+          return TRUE;
+        }
+      }
+    return FALSE;
   }
 
   return FALSE;

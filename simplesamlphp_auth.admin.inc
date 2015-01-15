@@ -79,7 +79,7 @@ function simplesamlphp_auth_settings() {
     '#type' => 'textarea',
     '#title' => t('Automatic role population from simpleSAMLphp attributes'),
     '#default_value' => variable_get('simplesamlphp_auth_rolepopulation', ''),
-    '#description' => t('A pipe separated list of rules.<br />Example: <i>roleid1:condition1|roleid2:contition2...</i> <br />For instance: <i>1:eduPersonPrincipalName,@=,uninett.no;affiliation,=,employee|2:mail,=,andreas@uninett.no</i>'),
+    '#description' => t('A pipe separated list of rules.<br />Example: <i>roleid1:condition1|roleid2:contition2...</i> <br />For instance: <i>1:eduPersonPrincipalName,@=,uninett.no;affiliation,=,employee|2:mail,=,andreas@uninett.no</i>,3:mail,~=,andre'),
   );
   $form['simplesamlphp_auth_grp_user']['simplesamlphp_auth_roleevaleverytime'] = array(
     '#type' => 'checkbox',
