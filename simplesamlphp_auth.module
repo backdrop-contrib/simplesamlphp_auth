@@ -774,7 +774,7 @@ function _simplesamlphp_auth_rolepopulation($rolemap) {
     foreach ($rolerules as $rolerule) {
       _simplesaml_auth_debug(t('Evaluate role rule: %rolerule', array('%rolerule' => $rolerule)));
 
-      $roleruledecompose = explode(':', $rolerule);
+      $roleruledecompose = explode(':', $rolerule, 2);
 
       $roleid              = $roleruledecompose[0];
       $roleruleevaluations = explode(';', $roleruledecompose[1]);
