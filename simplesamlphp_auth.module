@@ -189,7 +189,7 @@ function simplesamlphp_auth_init() {
   global $_simplesamlphp_auth_saml_config;
   global $_simplesamlphp_auth_saml_version;
 
-  if (!_simplesamlphp_auth_isEnabled(TRUE)) {
+  if (drupal_is_cli() || !_simplesamlphp_auth_isEnabled(TRUE)) {
     // Exit without initializing.
     return;
   }
