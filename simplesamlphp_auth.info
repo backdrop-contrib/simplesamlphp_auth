@@ -1,4 +1,8 @@
 name = simpleSAMLphp authentication
 description = Allows users to authenticate to a remote SAML identity provider (IdP) via a locally configured SimpleSAMLphp service point (SP).
-core = 7.x
+backdrop = 1.x
+type = module
 configure = admin/config/people/simplesamlphp_auth
+package = Development
+tags[] = Account Management
+dependencies[] = authmap

@@ -36,6 +36,6 @@ function hook_simplesamlphp_auth_logout_gotourl_alter(&$gotourl, $account) {
     );
 
     // Add our redirect URL as a querystring to the full URL.
-    $gotourl = $gotourl . '?redirect=' . drupal_encode_path($redirect_url);
+    $gotourl = $gotourl . '?redirect=' . backdrop_encode_path($redirect_url);
   }
 }

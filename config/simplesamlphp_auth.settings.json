@@ -1,0 +1,19 @@
+{
+    "_config_name": "simplesamlphp_auth.settings",
+    "activate": "",
+    "installdir": "/var/simplesamlphp",
+    "authsource": "default-sp",
+    "forcehttps": true,
+    "user_name": "eduPersonPrincipalName",
+    "unique_id": "eduPersonPrincipalName",
+    "mailattr": "mail",
+    "rolepopulation": "",
+    "roleevaleverytime": "0",
+    "registerusers": true,
+    "allowsetdrupalpwd": "",
+    "allowdefaultlogin": true,
+    "roles": [],
+    "users": "",
+    "logoutgotourl": "",
+    "user_register_original": "1"
+}

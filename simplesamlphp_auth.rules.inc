@@ -20,14 +20,20 @@ function simplesamlphp_auth_rules_event_info() {
       'label' => t('After registering a new user account via simpleSAMLphp'),
       'group' => t('User'),
       'variables' => array(
-        'user' => array('type' => 'user', 'label' => t('Logged in user')),
+        'user' => array(
+          'type' => 'user',
+          'label' => t('Logged in user'),
+        ),
       ),
     ),
     'simplesamlphp_auth_rules_event_login' => $defaults + array(
       'label' => t('User has logged in via simpleSAMLphp'),
       'group' => t('User'),
       'variables' => array(
-        'user' => array('type' => 'user', 'label' => t('User')),
+        'user' => array(
+          'type' => 'user',
+          'label' => t('User'),
+        ),
       ),
     ),
   );
