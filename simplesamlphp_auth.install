@@ -10,8 +10,6 @@
  */
 function simplesamlphp_auth_install() {
 
-  user_role_revoke_permissions(BACKDROP_AUTHENTICATED_RID, array('change own password'));
-
   // Disable the open registration to the site and store the original setting.
   $original = config_get('system.performance', 'user_register');
   config_set('system.performance', 'user_register', 0);
