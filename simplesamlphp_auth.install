@@ -70,6 +70,7 @@ function simplesamlphp_auth_update_1000() {
   $config->set('users', update_variable_get('simplesamlphp_auth_users', ''));
   $config->set('logoutgotourl', update_variable_get('simplesamlphp_auth_logoutgotourl', ''));
   $config->set('user_register_original', update_variable_get('simplesamlphp_auth_user_register_original', '1'));
+  $config->set('link_display_name', update_variable_get('simplesamlphp_auth_link_display_name', 'Federated Log In'));
   $config->save();
 
   update_variable_del('activate');
@@ -88,4 +89,5 @@ function simplesamlphp_auth_update_1000() {
   update_variable_del('users');
   update_variable_del('logoutgotourl');
   update_variable_del('user_register_original');
+  update_variable_del('simplesamlphp_auth_link_display_name');
 }
