@@ -48,7 +48,7 @@ function simplesamlphp_auth_settings() {
   $form['simplesamlphp_auth_grp_setup']['simplesamlphp_auth_login_link_display_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Federated Log In Link Display Name'),
-    '#default_value' => variable_get('simplesamlphp_auth_login_link_display_name', 'Federated Log In'),
+    '#default_value' => $config->get('link_display_name'),
     '#description' => t('Text to display as the link to the external federated login page. Default is "Federated Log In" and is passed through the core translation layer.'),
   );  
   $form['simplesamlphp_auth_grp_setup']['forcehttps'] = array(
