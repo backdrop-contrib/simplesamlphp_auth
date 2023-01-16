@@ -462,14 +462,14 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
   }
 
   if ($form_id == 'user_login_block') {
-    $link                     = l(t('Federated Log In'), 'saml_login');
+    $link                     = l($link_display_name, 'saml_login');
     $links                    = $form['links']['#markup'];
     $links                    = str_replace('</ul>', '<li class="saml">' . $link . '</li></ul>', $links);
     $form['links']['#markup'] = $links;
   }
 
   if ($form_id == 'user_account_form') {
-    $link                     = l(t('Federated Log In'), 'saml_login');
+    $link                     = l($link_display_name, 'saml_login');
     $links                    = $form['links']['#markup'];
     $links                    = str_replace('</ul>', '<li class="saml">' . $link . '</li></ul>', $links);
     $form['links']['#markup'] = $links;
@@ -680,7 +680,7 @@ function _simplesamlphp_auth_generate_block_text() {
     . '<br />' . l(t('Log Out'), 'user/logout') . '</p>';
   }
   else {
-    $block_content .= '<p>' . l(t('Federated Log In'), 'saml_login') . '</p>';
+    $block_content .= '<p>' . l($link_display_name, 'saml_login') . '</p>';
   }
 
   return $block_content;
