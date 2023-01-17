@@ -680,7 +680,7 @@ function _simplesamlphp_auth_generate_block_text() {
     . '<br />' . l(t('Log Out'), 'user/logout') . '</p>';
   }
   else {
-    $block_content .= '<p>' . l(config_get('simplesamlphp_auth.settings', 'login_link_display_name'), 'saml_login') . '</p>';  }
+    $block_content .= '<p>' . l(config_get('simplesamlphp_auth.settings', 'login_link_display_name'), 'saml_login') . '</p>';
   }
 
   return $block_content;
