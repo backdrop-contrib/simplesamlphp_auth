@@ -72,20 +72,20 @@ function simplesamlphp_auth_update_1000() {
   $config->set('user_register_original', update_variable_get('simplesamlphp_auth_user_register_original', '1'));
   $config->save();
 
-  update_variable_del('activate');
-  update_variable_del('installdir');
-  update_variable_del('authsource');
-  update_variable_del('forcehttps');
-  update_variable_del('user_name');
-  update_variable_del('unique_id');
-  update_variable_del('mailattr');
-  update_variable_del('rolepopulation');
-  update_variable_del('roleevaleverytime');
-  update_variable_del('registerusers');
-  update_variable_del('allowsetdrupalpwd');
-  update_variable_del('allowdefaultlogin');
-  update_variable_del('roles');
-  update_variable_del('users');
-  update_variable_del('logoutgotourl');
-  update_variable_del('user_register_original');
+  update_variable_del('simplesamlphp_auth_activate');
+  update_variable_del('simplesamlphp_auth_installdir');
+  update_variable_del('simplesamlphp_auth_authsource');
+  update_variable_del('simplesamlphp_auth_forcehttps');
+  update_variable_del('simplesamlphp_auth_user_name');
+  update_variable_del('simplesamlphp_auth_unique_id');
+  update_variable_del('simplesamlphp_auth_mailattr');
+  update_variable_del('simplesamlphp_auth_rolepopulation');
+  update_variable_del('simplesamlphp_auth_roleevaleverytime');
+  update_variable_del('simplesamlphp_auth_registerusers');
+  update_variable_del('simplesamlphp_auth_allowsetdrupalpwd');
+  update_variable_del('simplesamlphp_auth_allowdefaultlogin');
+  update_variable_del('simplesamlphp_auth_roles');
+  update_variable_del('simplesamlphp_auth_users');
+  update_variable_del('simplesamlphp_auth_logoutgotourl');
+  update_variable_del('simplesamlphp_auth_user_register_original');
 }
