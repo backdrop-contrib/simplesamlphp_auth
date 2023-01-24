@@ -11,11 +11,9 @@
 function simplesamlphp_auth_install() {
 
   // Disable the open registration to the site and store the original setting.
-  $original = config_get('system.performance', 'user_register');
-  config_set('system.performance', 'user_register', 0);
+  $original = config_get('system.core', 'user_register');
+  config_set('system.core', 'user_register', 0);
   config_set('simplesamlphp_auth.settings', 'user_register_original', $original);
-
-  // Dynamically generated variable data was detected on the following lines.
 }
 
 /**
