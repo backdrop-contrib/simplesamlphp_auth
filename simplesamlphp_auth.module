@@ -417,6 +417,11 @@ function simplesamlphp_auth_user_insert($account) {
  * Implements hook_user_logout().
  */
 function simplesamlphp_auth_user_logout($account) {
+  if (!_simplesamlphp_auth_isEnabled()) {
+    // Exit without executing.
+    return;
+  }
+
   $config = config('simplesamlphp_auth.settings');
   global $user;
   global $_simplesamlphp_auth_as;
