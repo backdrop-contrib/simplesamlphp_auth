@@ -535,7 +535,7 @@ function simplesamlphp_auth_block_info() {
  * Checks to see if authentication via SimpleSAMLphp should be activated.
  *
  * @param bool $show_inactive_msg
- *   Whether to display the "module not activated" message
+ *   Whether to display the "module not activated" message.
  *
  * @return bool
  *   TRUE/FALSE
@@ -554,18 +554,15 @@ function _simplesamlphp_auth_isEnabled($show_inactive_msg = FALSE) {
       $failure = t('SimpleSAMLphp could not be found at %basedir . The simplesamlphp_auth module cannot function until the path to the local SimpleSAMLphp instance is configured.', array('%basedir' => $basedir));
       watchdog('simplesamlphp_auth', $failure, NULL, WATCHDOG_WARNING);
     }
-  }
-
-  // If there were no failures, then it should be activated.
-  if (!$failure) {
-    return TRUE;
-  }
-  else {
-
-    // Communicate but don't be too annoying.
-    if ($show_inactive_msg && (1 == $user->uid || user_access('access administration pages')) && (preg_match('/admin\/people/', request_uri()) || preg_match('/admin\/modules/', request_uri()) || preg_match('/admin\/config/', request_uri()))) {
-      backdrop_set_message($failure);
+    // If there were no failures, then it should be activated.
+    if (!$failure) {
+      return TRUE;
     }
+  }
+  // If we made it this far, it's not activated.
+  // Communicate but don't be too annoying.
+  if ($failure && $show_inactive_msg && (1 == $user->uid || user_access('access administration pages')) && (preg_match('/admin\/people/', request_uri()) || preg_match('/admin\/modules/', request_uri()) || preg_match('/admin\/config/', request_uri()))) {
+    backdrop_set_message($failure);
   }
   return FALSE;
 }
@@ -616,9 +613,9 @@ function _simplesamlphp_auth_get_default_name($account) {
     ) {
       throw new Exception(t('There was no set attribute named "%auth_user_name_attr" returned for user %uid.',
         array(
-        '%auth_user_name_attr' => $auth_user_name_attr,
-        '%uid' => $account,
-      )));
+          '%auth_user_name_attr' => $auth_user_name_attr,
+          '%uid' => $account,
+        )));
     }
     $default_name = $_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0];
   }
