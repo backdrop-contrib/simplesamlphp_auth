@@ -91,3 +91,14 @@ function simplesamlphp_auth_update_1000() {
   update_variable_del('user_register_original');
   update_variable_del('simplesamlphp_auth_login_link_display_name');
 }
+
+/**
+ * Ensure a default value for the login link title.
+ */
+function simplesamlphp_auth_update_1200() {
+  $config = config('simplesamlphp_auth.settings');
+  if (empty($config->get('login_link_display_name'))) {
+      $config->set('login_link_display_name', 'Federated Log In');
+      $config->save();
+  }
+}
