@@ -86,7 +86,7 @@ function simplesamlphp_auth_loginpage() {
   }
 
   // Do some sanity checking before attempting anything.
-  $config = SimpleSAML_Configuration::getInstance();
+  $config = SimpleSAML\Configuration::getInstance();
   $config_store_type = $config->getValue('store.type');
 
   // Make sure phpsession is NOT being used.
@@ -95,7 +95,7 @@ function simplesamlphp_auth_loginpage() {
     $fail = TRUE;
   }
 
-  // Make sure there is an instance of SimpleSAML_Auth_Simple.
+  // Make sure there is an instance of SimpleSAML\Auth\Simple.
   if (!$_simplesamlphp_auth_as) {
     watchdog('simplesamlphp_auth', 'A user attempted to login using this module but there was a problem.', NULL, WATCHDOG_WARNING);
     $fail = TRUE;
@@ -204,11 +204,11 @@ function simplesamlphp_auth_init() {
     return;
   }
 
-  $_simplesamlphp_auth_saml_config  = SimpleSAML_Configuration::getInstance();
+  $_simplesamlphp_auth_saml_config  = SimpleSAML\Configuration::getInstance();
   $_simplesamlphp_auth_saml_version = $_simplesamlphp_auth_saml_config->getVersion();
 
   // Load simpleSAMLphp, configuration and metadata.
-  $_simplesamlphp_auth_as              = new SimpleSAML_Auth_Simple($config->get('authsource'));
+  $_simplesamlphp_auth_as              = new SimpleSAML\Auth\Simple($config->get('authsource'));
   $_simplesamlphp_auth_saml_attributes = $_simplesamlphp_auth_as->getAttributes();
 
   if ($user->uid == 0) {
