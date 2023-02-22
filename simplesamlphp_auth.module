@@ -245,7 +245,10 @@ function simplesamlphp_auth_init() {
 
             if (!empty($user->uid)) {
               // Populate roles based on configuration setting.
-              $user->roles = _rolepopulation($config->get('rolepopulation'));
+              $rolepopulation = $config->get('rolepopulation');
+              if (!empty($rolepopulation)) {
+                $user->roles = _rolepopulation($rolepopulation);
+              }
               $user->save();
             }
             else {
