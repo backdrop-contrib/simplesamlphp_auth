@@ -41,6 +41,9 @@ The configuration of the module is fairly straight forward. You will need to
 know the names of the attributes that your SP will be making available to the
 module in order to map them into Backdrop CMS.
 
+Read details in [Configuration Guide](https://github.com/backdrop-contrib/simplesamlphp_auth/wiki/Configuring-Authentication-using-SimpleSAMLphp)
+
+
 
 Issues
 ------
