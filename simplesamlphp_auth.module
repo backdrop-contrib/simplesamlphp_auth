@@ -462,7 +462,7 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
   }
 
   if ($form_id == 'user_login_block') {
-    $$link                     = l(config_get('simplesamlphp_auth.settings', 'login_link_display_name'), 'saml_login');
+    $link                     = l(config_get('simplesamlphp_auth.settings', 'login_link_display_name'), 'saml_login');
     $links                    = $form['links']['#markup'];
     $links                    = str_replace('</ul>', '<li class="saml">' . $link . '</li></ul>', $links);
     $form['links']['#markup'] = $links;
