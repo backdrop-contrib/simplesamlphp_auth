@@ -229,8 +229,82 @@ function simplesamlphp_auth_init() {
         _simplesaml_auth_debug(t('Load user [%authname]', array('%authname' => $authname)));
 
         // Retrieve user mapping and attempt to log the user in.
-        $ext_user               = authmap_external_load($authname);
+        $ext_user = authmap_external_load($authname);
         $skip_user_finalization = FALSE;
+
+        // First we check the admin settings for SimpleSAMLphp and find out
+        // if we are allowed to register users.
+        $register_new_users = $config->get('registerusers');
+        $username_collision_method = $config->get('username_collision');
+
+        if (!$ext_user && $register_new_users) {
+          $username = NULL;
+          $mail_address = NULL;
+          try {
+            $username = _simplesamlphp_auth_get_default_name(0);
+            // Get mail from default attribute.
+            $mail_address = _simplesamlphp_auth_get_mail();
+          }
+          catch (Exception $e) {
+            // Not configured appropriately.
+            watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
+          }
+
+          // Allow third party modules to handle which username/email to use for
+          // the registration check. e.g. if they're moving email domains.
+          backdrop_alter('simplesamlphp_auth_name_mail', $username, $mail_address);
+
+          $user_local = $username ? user_load_by_name($username) : NULL;
+          $user_email_local = $mail_address ? user_load_by_mail($mail_address) : NULL;
+          if ($user_local || $user_email_local) {
+            // Local username or mail account exists. Attempt to merge it or bail early.
+            if ($user_local && $user_email_local) {
+              if ($user_local->uid != $user_email_local->uid) {
+                // We've found multiple accounts, one with their username and another with their email.
+                // We can't link this user. Abort.
+                backdrop_set_message(
+                  t(
+                    "Attempted to login using username @username and email @email, but found two local accounts with those values. Please contact the site administrator so they may deactivate one of the accounts.",
+                    ['@username' => $username, '@email' => $mail_address,]
+                  ),
+                  'warning'
+                );
+
+                $_simplesamlphp_auth_as->logout(base_path());
+                return;
+              }
+            }
+            elseif ($user_email_local) {
+              $user_local = $user_email_local;
+            }
+
+            if ($username_collision_method === 'merge') {
+              // If we are going to silently merge the external and local accounts
+              // we need to adjust the authmap table before proceeding with the
+              // login.
+              _simplesaml_auth_debug(t('Username/email collision detected. Username @username is authenticating via simpleSAMLphp but already exists as a local user. Merging external and local accounts and proceeding with login.',
+                array('@username' => $username)));
+              authmap_set_authmaps($user_local, array('authname_simplesamlphp_auth' => $authname));
+            }
+            else {
+              // If we abort the login simply report and return.
+              $warning_message = t('Username collision detected. Username @username is authenticating via simpleSAMLphp but already exists as a local user. Aborting login.',
+                ['@username' => $username]);
+              _simplesaml_auth_debug($warning_message);
+              backdrop_set_message($warning_message, 'warning');
+              $_simplesamlphp_auth_as->logout(base_path());
+              return;
+            }
+
+            // Force a login.
+            user_external_login_register($authname, 'simplesamlphp_auth');
+            $skip_user_finalization = TRUE;
+            if ($user->uid) {
+              // Specify the external user.
+              $ext_user = $user;
+            }
+          }
+        }
 
         if (!$ext_user) {
           // First we check the admin settings for simpleSAMLphp and find out
