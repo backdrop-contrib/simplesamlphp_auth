@@ -364,30 +364,34 @@ function simplesamlphp_auth_init() {
 function simplesamlphp_auth_user_insert($account) {
   global $_simplesamlphp_auth_as;
   global $_simplesamlphp_auth_saml_attributes;
+  global $user;
 
-  if (!_simplesamlphp_auth_isEnabled()) {
+  if (!_simplesamlphp_auth_isEnabled() || !$_simplesamlphp_auth_as->isAuthenticated()) {
     // Exit without initializing.
     return;
   }
 
-  // If user registration has a valid session...
-  if ($_simplesamlphp_auth_as->isAuthenticated()) {
+  // There are cases where the logged in user is an admin and is creating
+  // accounts.  In such cases we don't want to use their name and email;
+  // we want to keep the supplied values.
+  $mail_address = '';
+  if ($user->uid == 0 || $user->uid === $account->uid) {
     // Get name from default attributes.
     try {
       _simplesaml_auth_debug(t('Registering user [%acctname]', array('%acctname' => $account->name)));
       $account->name = _simplesamlphp_auth_get_default_name($account->uid);
+
+      db_update('users')
+      ->fields(array('name' => $account->name))
+      ->condition('uid', $account->uid)
+      ->execute();
+
+      _simplesaml_auth_debug(t('Updating username [%acctname]', array('%acctname' => $account->name)));
     }
     catch (Exception $e) {
       backdrop_set_message(t('Your user name was not provided by your identity provider (IDP).'), "error");
       watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
     }
-
-    db_update('users')
-      ->fields(array('name' => $account->name))
-      ->condition('uid', $account->uid)
-      ->execute();
-
-    _simplesaml_auth_debug(t('Updating username [%acctname]', array('%acctname' => $account->name)));
 
     // Get mail from default attribute.
     try {
@@ -397,20 +401,26 @@ function simplesamlphp_auth_user_insert($account) {
       backdrop_set_message(t('Your e-mail address was not provided by your identity provider (IDP).'), "error");
       watchdog('simplesamlphp_auth', $e->getMessage(), NULL, WATCHDOG_CRITICAL);
     }
-
-    if (!empty($mail_address)) {
-      db_update('users')
-        ->fields(array('mail' => $mail_address))
-        ->condition('uid', $account->uid)
-        ->execute();
-    }
-
-    if (module_exists('rules')) {
-      rules_invoke_event('simplesamlphp_auth_rules_event_register', $account);
-    }
-
-    _simplesaml_auth_debug(t('Updating mail [%mailaddr]', array('%mailaddr' => $mail_address)));
   }
+  else {
+    if (!empty($account->mail)) {
+      $mail_address = $account->mail;
+    }
+  }
+
+  if (!empty($mail_address)) {
+    db_update('users')
+      ->fields(array('mail' => $mail_address))
+      ->condition('uid', $account->uid)
+      ->execute();
+  }
+
+  if (module_exists('rules')) {
+    rules_invoke_event('simplesamlphp_auth_rules_event_register', $account);
+  }
+
+  _simplesaml_auth_debug(t('Updating mail [%mailaddr]', array('%mailaddr' => $mail_address)));
+
 }
 
 /**
@@ -535,7 +545,7 @@ function simplesamlphp_auth_block_info() {
  * Checks to see if authentication via SimpleSAMLphp should be activated.
  *
  * @param bool $show_inactive_msg
- *   Whether to display the "module not activated" message
+ *   Whether to display the "module not activated" message.
  *
  * @return bool
  *   TRUE/FALSE
@@ -616,9 +626,9 @@ function _simplesamlphp_auth_get_default_name($account) {
     ) {
       throw new Exception(t('There was no set attribute named "%auth_user_name_attr" returned for user %uid.',
         array(
-        '%auth_user_name_attr' => $auth_user_name_attr,
-        '%uid' => $account,
-      )));
+          '%auth_user_name_attr' => $auth_user_name_attr,
+          '%uid' => $account,
+        )));
     }
     $default_name = $_simplesamlphp_auth_saml_attributes[$auth_user_name_attr][0];
   }
