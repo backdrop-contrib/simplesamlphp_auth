@@ -41,6 +41,7 @@ The configuration of the module is fairly straight forward. You will need to
 know the names of the attributes that your SP will be making available to the
 module in order to map them into Backdrop CMS.
 
+You can also refer to (and contribute to) the documentation in [the Wiki](https://github.com/backdrop-contrib/simplesamlphp_auth/wiki).
 
 Issues
 ------
@@ -53,12 +54,14 @@ Current Maintainers
 -------------------
 
 - [Joel Steidl](https://github.com/joelsteidl).
+- [Laryn Kragt Bakker](https://github.com/laryn).
 - Seeking additional maintainers.
 
 Credits
 -------
 
 - Ported to Backdrop CMS by [Joel Steidl](https://github.com/joelsteidl).
+- Backdrop version supported by [Aten Design Group](https://atendesigngroup.com).
 - Originally written for Drupal by
   Steve Moitozo [geekwisdom](http://drupal.org/user/1662)
 
