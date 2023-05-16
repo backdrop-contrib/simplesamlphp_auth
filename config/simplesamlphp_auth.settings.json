@@ -1,5 +1,8 @@
 {
     "_config_name": "simplesamlphp_auth.settings",
+    "_config_translatables": [
+        "login_link_display_name"
+    ],
     "activate": "",
     "installdir": "/var/simplesamlphp",
     "authsource": "default-sp",
@@ -10,11 +13,12 @@
     "rolepopulation": "",
     "roleevaleverytime": "0",
     "registerusers": true,
-    "allowsetdrupalpwd": "",
+    "allowsetbackdroppwd": "",
     "allowdefaultlogin": true,
     "roles": [],
     "users": "",
     "logoutgotourl": "",
     "user_register_original": "1",
+    "username_collision": "merge",
     "login_link_display_name": "Federated Login"
 }

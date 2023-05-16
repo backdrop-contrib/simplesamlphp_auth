@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * simpleSAMLphp authentication module for Backdrop.
@@ -553,14 +552,14 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
   }
 
   if ($form_id == 'user_login_block') {
-    $link                     = l(config_get('simplesamlphp_auth.settings', 'login_link_display_name'), 'saml_login');
+    $link                     = l(filter_xss_admin(config_get_translated('simplesamlphp_auth.settings', 'login_link_display_name')), 'saml_login');
     $links                    = $form['links']['#markup'];
     $links                    = str_replace('</ul>', '<li class="saml">' . $link . '</li></ul>', $links);
     $form['links']['#markup'] = $links;
   }
 
   if ($form_id == 'user_account_form') {
-    $link                     = l(config_get('simplesamlphp_auth.settings', 'login_link_display_name'), 'saml_login');
+    $link                     = l(filter_xss_admin(config_get_translated('simplesamlphp_auth.settings', 'login_link_display_name')), 'saml_login');
     $links                    = $form['links']['#markup'];
     $links                    = str_replace('</ul>', '<li class="saml">' . $link . '</li></ul>', $links);
     $form['links']['#markup'] = $links;
@@ -765,10 +764,10 @@ function _simplesamlphp_auth_generate_block_text() {
   // Check if valid local session exists..
   if ($_simplesamlphp_auth_as->isAuthenticated()) {
     $block_content .= '<p>' . t('Logged in as: @username', array('@username' => $user->name))
-    . '<br />' . l(t('Log Out'), 'user/logout') . '</p>';
+    . '<br />' . l(t('Log out'), 'user/logout') . '</p>';
   }
   else {
-    $block_content .= '<p>' . l(config_get('simplesamlphp_auth.settings', 'login_link_display_name'), 'saml_login') . '</p>';
+    $block_content .= '<p>' . l(filter_xss_admin(config_get_translated('simplesamlphp_auth.settings', 'login_link_display_name')), 'saml_login') . '</p>';
   }
 
   return $block_content;

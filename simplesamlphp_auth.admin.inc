@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Admin include file for admin settings form.
@@ -45,12 +44,11 @@ function simplesamlphp_auth_settings() {
     '#default_value' => $config->get('authsource'),
     '#description' => t('The name of the source to use from /var/simplesamlphp/config/authsources.php'),
   );
-  $display_name = $config->get('login_link_display_name');
   $form['simplesamlphp_auth_grp_setup']['login_link_display_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Federated login link display name'),
-    '#default_value' => ($display_name != 'Federated Login') ? $display_name : t('Federated Login'),
-    '#description' => t('Text to display as the link to the external federated login page. The default is "Federated Login" which is passed through the core translation layer. You can also change the value in the configuration settings.'),
+    '#default_value' => $config->get('login_link_display_name'),
+    '#description' => t('Text to display as the link to the external federated login page. This value will be passed through the core translation layer.'),
   );
   $form['simplesamlphp_auth_grp_setup']['forcehttps'] = array(
     '#type' => 'checkbox',

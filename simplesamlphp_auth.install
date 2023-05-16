@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * the install file for the simplesamlphp_auth module
@@ -91,12 +90,13 @@ function simplesamlphp_auth_update_1000() {
 }
 
 /**
- * Ensure a default value for the login link title.
+ * Ensure a default value for the login link title and allow translation.
  */
 function simplesamlphp_auth_update_1200() {
   $config = config('simplesamlphp_auth.settings');
   if (empty($config->get('login_link_display_name'))) {
       $config->set('login_link_display_name', 'Federated Login');
-      $config->save();
   }
+  $config->set('_config_translatables', array('login_link_display_name'));
+  $config->save();
 }
