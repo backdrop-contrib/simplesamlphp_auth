@@ -102,7 +102,16 @@ function simplesamlphp_auth_settings() {
     '#default_value' => $config->get('registerusers'),
     '#description' => t("Determines wether or not the module should automatically create/register new Backdrop accounts for users that authenticate using SimpleSAMLphp. Unless you've done some custom work to provision Backdrop accounts with the necessary authmap entries you will want this checked. NOTE: If unchecked each user must already have been provisioned a Backdrop account with an appropriate entry in the authmap table before logging in. Otherwise they will receive a notice and be denied access. Be aware that simply creating a Backdrop account will not create the necessary entry in the authmap table."),
   );
-
+  $form['simplesamlphp_auth_grp_reg']['username_collision'] = array(
+    '#type' => 'select',
+    '#title' => t('How to handle username collisions'),
+    '#options' => array(
+      'abort' => t('Abort login and show error'),
+      'merge' => t('Allow login and silently link accounts'),
+    ),
+    '#default_value' => (!empty($config->get('username_collision'))) ? $config->get('username_collision') : 'abort',
+    '#description' => t("What to do when an external account conflicts with an existing local account with a matching username. The option to allow the login and link accounts should only be used in controlled circumstances when you are certain that all accounts with matching usernames represent the same individual users."),
+  );
   $form['simplesamlphp_auth_grp_auth'] = array(
     '#type' => 'fieldset',
     '#title' => t('Backdrop Authentication'),
