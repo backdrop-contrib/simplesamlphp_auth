@@ -68,6 +68,7 @@ function simplesamlphp_auth_update_1000() {
   $config->set('users', update_variable_get('simplesamlphp_auth_users', ''));
   $config->set('logoutgotourl', update_variable_get('simplesamlphp_auth_logoutgotourl', ''));
   $config->set('user_register_original', update_variable_get('simplesamlphp_auth_user_register_original', '1'));
+  $config->set('login_link_display_name', update_variable_get('simplesamlphp_auth_link_display_name', 'Federated Login'));
   $config->save();
 
   update_variable_del('simplesamlphp_auth_activate');
@@ -86,4 +87,16 @@ function simplesamlphp_auth_update_1000() {
   update_variable_del('simplesamlphp_auth_users');
   update_variable_del('simplesamlphp_auth_logoutgotourl');
   update_variable_del('simplesamlphp_auth_user_register_original');
+  update_variable_del('simplesamlphp_auth_login_link_display_name');
+}
+
+/**
+ * Ensure a default value for the login link title.
+ */
+function simplesamlphp_auth_update_1200() {
+  $config = config('simplesamlphp_auth.settings');
+  if (empty($config->get('login_link_display_name'))) {
+      $config->set('login_link_display_name', 'Federated Login');
+      $config->save();
+  }
 }

@@ -15,5 +15,6 @@
     "roles": [],
     "users": "",
     "logoutgotourl": "",
-    "user_register_original": "1"
+    "user_register_original": "1",
+    "login_link_display_name": "Federated Login"
 }

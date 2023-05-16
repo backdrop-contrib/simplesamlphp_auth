@@ -45,13 +45,19 @@ function simplesamlphp_auth_settings() {
     '#default_value' => $config->get('authsource'),
     '#description' => t('The name of the source to use from /var/simplesamlphp/config/authsources.php'),
   );
+  $display_name = $config->get('login_link_display_name');
+  $form['simplesamlphp_auth_grp_setup']['login_link_display_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Federated login link display name'),
+    '#default_value' => ($display_name != 'Federated Login') ? $display_name : t('Federated Login'),
+    '#description' => t('Text to display as the link to the external federated login page. The default is "Federated Login" which is passed through the core translation layer. You can also change the value in the configuration settings.'),
+  );
   $form['simplesamlphp_auth_grp_setup']['forcehttps'] = array(
     '#type' => 'checkbox',
     '#title' => t('Force https for login links'),
     '#default_value' => $config->get('forcehttps'),
     '#description' => t('Should be enabled on production sites.'),
   );
-
   $form['simplesamlphp_auth_grp_user'] = array(
     '#type' => 'fieldset',
     '#title' => t('User Info and Syncing'),
@@ -81,13 +87,13 @@ function simplesamlphp_auth_settings() {
     '#type' => 'textarea',
     '#title' => t('Automatic role population from simpleSAMLphp attributes'),
     '#default_value' => $config->get('rolepopulation'),
-    '#description' => t('A pipe separated list of rules.<br />Example: <i>roleid1:condition1|roleid2:contition2...</i> <br />For instance: <i>1:eduPersonPrincipalName,@=,uninett.no;affiliation,=,employee|2:mail,=,andreas@uninett.no</i>,3:mail,~=,andre'),
+    '#description' => t('A pipe separated list of rules.<br />Example: <i>roleid1:condition1|roleid2:condition2...</i> <br />For instance: <i>1:eduPersonPrincipalName,@=,uninett.no;affiliation,=,employee|2:mail,=,andreas@uninett.no</i>,3:mail,~=,andre'),
   );
   $form['simplesamlphp_auth_grp_user']['roleevaleverytime'] = array(
     '#type' => 'checkbox',
     '#title' => t('Reevaluate roles every time the user logs in.'),
     '#default_value' => $config->get('roleevaleverytime'),
-    '#description' => t('NOTE: This means users could loose any roles that have been assigned manually in Backdrop.'),
+    '#description' => t('NOTE: This means users could lose any roles that have been assigned manually in Backdrop.'),
   );
 
   $form['simplesamlphp_auth_grp_reg'] = array(
