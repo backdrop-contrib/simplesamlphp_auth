@@ -296,7 +296,7 @@ function simplesamlphp_auth_init() {
             }
 
             // Force a login.
-            user_external_login_register($authname, 'simplesamlphp_auth');
+            authmap_external_login_register($authname, 'simplesamlphp_auth');
             $skip_user_finalization = TRUE;
             if ($user->uid) {
               // Specify the external user.
