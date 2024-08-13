@@ -1,0 +1,15 @@
+{
+  "name": "backdrop/simplesamlphp_auth",
+  "description": "Allows users to authenticate to a remote SAML identity provider (IdP) via a locally configured SimpleSAMLphp service point (SP).",
+  "type": "backdrop-module",
+  "license": "GPL-2.0+",
+  "homepage": "https://www.backdropcms.org/project/simplesamlphp_auth",
+  "require": {
+    "simplesamlphp/simplesamlphp": "^1.19||^2.0"
+  },
+  "config": {
+    "allow-plugins": {
+      "simplesamlphp/composer-module-installer": true
+    }
+  }
+}

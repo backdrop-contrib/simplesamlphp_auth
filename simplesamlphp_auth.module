@@ -193,16 +193,19 @@ function simplesamlphp_auth_init() {
     return;
   }
 
+  if (!class_exists('\SimpleSAML\Configuration')) {
+    // Load the SimpleSAMLphp library if it isn't already loaded.
+    $basedir = $config->get('installdir');
+
+    if (file_exists($basedir . '/lib/_autoload.php')) {
+      require_once $basedir . '/lib/_autoload.php';
+    }
+    if (!class_exists('\SimpleSAML\Configuration')) {
+      return;
+    }
+  }
+
   // Get the simplesamlphp session.
-  $basedir = $config->get('installdir');
-
-  if (file_exists($basedir . '/lib/_autoload.php')) {
-    require_once $basedir . '/lib/_autoload.php';
-  }
-  else {
-    return;
-  }
-
   $_simplesamlphp_auth_saml_config  = \SimpleSAML\Configuration::getInstance();
   $_simplesamlphp_auth_saml_version = $_simplesamlphp_auth_saml_config->getVersion();
 
@@ -640,9 +643,8 @@ function _simplesamlphp_auth_isEnabled($show_inactive_msg = FALSE) {
 
   if ($is_activated) {
     // Make sure we know where SimpleSAMLphp is.
-    if (!file_exists($basedir)) {
-      $failure = t('SimpleSAMLphp could not be found at %basedir . The simplesamlphp_auth module cannot function until the path to the local SimpleSAMLphp instance is configured.', array('%basedir' => $basedir));
-      watchdog('simplesamlphp_auth', $failure, NULL, WATCHDOG_WARNING);
+    if (!class_exists('\SimpleSAML\Configuration') && !file_exists($basedir)) {
+      $failure = t('This module requires the SimpleSAMLphp library. See the !simplesamlphp module project page for further information.', array('!simplesamlphp' => l(t('SimpleSAMLphp'), 'https://backdropcms.org/project/simplesamlphp_auth')));      watchdog('simplesamlphp_auth', $failure, NULL, WATCHDOG_WARNING);
     }
     // If there were no failures, then it should be activated.
     if (!$failure) {

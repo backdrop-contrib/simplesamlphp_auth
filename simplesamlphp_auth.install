@@ -33,12 +33,12 @@ function simplesamlphp_auth_requirements($phase) {
     }
 
     $basedir = $config->get('installdir');
-    if (!file_exists($basedir . '/lib/_autoload.php')) {
+    if (!class_exists('\SimpleSAML\Configuration') && !file_exists($basedir . '/lib/_autoload.php')) {
       $requirements['simplesamlphp_auth'] = array(
         'severity' => REQUIREMENT_WARNING,
         'title' => 'simpleSAMLphp_auth',
-        'value' => t('SimpleSAMLphp authentication is missing the required SimpleSAMLphp library'),
-        'description' => t('Please download and install the !simplesamlphp library.', array('!simplesamlphp' => l(t('SimpeSAMLphp'), 'https://simplesamlphp.org/download'))),
+        'value' => t('Missing SimpleSAMLphp library'),
+        'description' => t('This module requires the SimpleSAMLphp library. See the !simplesamlphp module project page for further information.', array('!simplesamlphp' => l(t('SimpleSAMLphp'), 'https://backdropcms.org/project/simplesamlphp_auth'))),
       );
     }
   }

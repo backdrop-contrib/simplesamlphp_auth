@@ -30,14 +30,22 @@ function simplesamlphp_auth_settings() {
     '#type' => 'checkbox',
     '#title' => t('Activate authentication via SimpleSAMLphp'),
     '#default_value' => $config->get('activate'),
-    '#description' => t('Checking this box before configuring the module could lock you out of Backdrop.'),
+    '#description' => t('Selecting this option before configuring the module could lock you out of Backdrop.'),
   );
-  $form['simplesamlphp_auth_grp_setup']['installdir'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Installation directory (default: /var/simplesamlphp)'),
-    '#default_value' => $config->get('installdir'),
-    '#description' => t('The base directory of simpleSAMLphp. Absolute path with no trailing slash.'),
-  );
+  if (class_exists('\SimpleSAML\Configuration')) {
+    $form['simplesamlphp_auth_grp_setup']['installdir'] = array(
+      '#type' => 'markup',
+      '#markup' => '<p>' . t('The SimpleSAMLphp library is loaded.') . '</p>',
+    );
+  }
+  else {
+    $form['simplesamlphp_auth_grp_setup']['installdir'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Installation directory (default: /var/simplesamlphp)'),
+      '#default_value' => $config->get('installdir'),
+      '#description' => t('The base directory where simpleSAMLphp is installed (absolute path with no trailing slash). This setting is ignored if the library is loaded separately (e.g. via Composer).'),
+    );
+  }
   $form['simplesamlphp_auth_grp_setup']['authsource'] = array(
     '#type' => 'textfield',
     '#title' => t('Authenticaton source for this SP (default: default-sp)'),
