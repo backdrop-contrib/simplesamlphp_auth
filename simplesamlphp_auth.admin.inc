@@ -33,10 +33,7 @@ function simplesamlphp_auth_settings() {
     '#description' => t('Selecting this option before configuring the module could lock you out of Backdrop.'),
   );
   if (class_exists('\SimpleSAML\Configuration')) {
-    $form['simplesamlphp_auth_grp_setup']['installdir'] = array(
-      '#type' => 'markup',
-      '#markup' => '<p>' . t('The SimpleSAMLphp library is loaded.') . '</p>',
-    );
+    backdrop_set_message(t('The SimpleSAMLphp library is loaded.'), 'status');
   }
   else {
     $form['simplesamlphp_auth_grp_setup']['installdir'] = array(
@@ -48,7 +45,7 @@ function simplesamlphp_auth_settings() {
   }
   $form['simplesamlphp_auth_grp_setup']['authsource'] = array(
     '#type' => 'textfield',
-    '#title' => t('Authenticaton source for this SP (default: default-sp)'),
+    '#title' => t('Authentication source for this SP (default: default-sp)'),
     '#default_value' => $config->get('authsource'),
     '#description' => t('The name of the source to use from /var/simplesamlphp/config/authsources.php'),
   );

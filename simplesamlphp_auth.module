@@ -205,7 +205,7 @@ function simplesamlphp_auth_init() {
     }
   }
 
-  // Get the simplesamlphp session.
+  // Get the SimpleSAMLphp session.
   $_simplesamlphp_auth_saml_config  = \SimpleSAML\Configuration::getInstance();
   $_simplesamlphp_auth_saml_version = $_simplesamlphp_auth_saml_config->getVersion();
 
