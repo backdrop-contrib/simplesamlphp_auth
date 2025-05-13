@@ -40,13 +40,26 @@ function simplesamlphp_auth_menu() {
     'file' => 'simplesamlphp_auth.admin.inc',
   );
 
+  $link_text = filter_xss_admin(config_get_translated('simplesamlphp_auth.settings', 'login_link_display_name'));
+
   $items['saml_login'] = array(
-    'title' => 'Logon to the site',
+    'title' => $link_text,
     'description' => 'Provides a site login page',
     'page callback' => 'simplesamlphp_auth_loginpage',
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
+
+  if (_simplesamlphp_auth_isEnabled()) {
+    // Add a new tab to the user login/register/password pages.
+    $items['user/saml_login'] = array(
+      'title' => $link_text,
+      'page callback' => 'backdrop_goto',
+      'page arguments' => array('saml_login'),
+      'access callback' => TRUE,
+      'type' => MENU_LOCAL_TASK,
+    );
+  }
 
   return $items;
 }
@@ -554,25 +567,6 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
     return;
   }
 
-  $forms_to_alter = array(
-    'user_login_block',
-    'user_login',
-    'user_pass',
-    'user_register',
-  );
-
-  if (in_array($form_id, $forms_to_alter)) {
-    $link_text = filter_xss_admin(config_get_translated('simplesamlphp_auth.settings', 'login_link_display_name'));
-    $link = l($link_text, 'saml_login', array(
-      'attributes' => array(
-        'class' => array(
-          'saml',
-        ),
-      ),
-    ));
-    $form['links']['#items'][] = $link;
-  }
-
   // If the user has a simplesamlphp_auth authmap record, then don't require
   // them to know their Backdrop password. This will allow them to change their
   // e-mail address, and set a Backdrop password if they want to and are allowed.
@@ -594,7 +588,6 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
  * Implements hook_block_view().
  */
 function simplesamlphp_auth_block_view($delta = '') {
-
   if (!_simplesamlphp_auth_isEnabled()) {
     // Exit without executing.
     return;
