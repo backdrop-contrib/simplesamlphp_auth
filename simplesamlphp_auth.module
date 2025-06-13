@@ -371,10 +371,9 @@ function simplesamlphp_auth_init() {
             // Save the updated roles and populate the user object.
             $ext_user->save();
           }
-          else {
-            // No need to evaluate roles, populate the user object.
-            $user = $ext_user;
-          }
+
+          // Populate the user object.
+          $user = $ext_user;
 
           if (module_exists('rules')) {
             rules_invoke_all('simplesamlphp_auth_rules_event_login', $user);
