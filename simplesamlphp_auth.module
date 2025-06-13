@@ -428,7 +428,7 @@ function simplesamlphp_auth_init() {
             // Log the user out of Backdrop if:
             // 1) the current user's uid is NOT in the list of allowed uids
             // 2) or their role does not match and allowed mixed mode role.
-            $match_roles = array_intersect(array_keys($user->roles), $array_allow_def_log_roles);
+            $match_roles = array_intersect($user->roles, $array_allow_def_log_roles);
             if (!in_array($user->uid, $array_allow_def_log_users) && count($match_roles) == 0) {
               // User is logged into Backdrop, but may not be logged into
               // simpleSAML. If this is the case we're supposed to log the
