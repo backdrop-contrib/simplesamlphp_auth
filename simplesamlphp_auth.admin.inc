@@ -13,7 +13,7 @@ function simplesamlphp_auth_settings() {
 
   if (!empty($_simplesamlphp_auth_saml_version)) {
     $ver = explode('.', $_simplesamlphp_auth_saml_version);
-    if (!($ver[0] >= 1 && $ver[1] >= 5)) {
+    if (!($ver[0] >= 2 && $ver[1] >= 3)) {
       backdrop_set_message(t("Please upgrade SimpleSAMLphp. You are using %ssp_version", array('%ssp_version' => $_simplesamlphp_auth_saml_version)), 'warning');
     }
   }

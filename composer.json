@@ -5,7 +5,7 @@
   "license": "GPL-2.0+",
   "homepage": "https://www.backdropcms.org/project/simplesamlphp_auth",
   "require": {
-    "simplesamlphp/simplesamlphp": "^1.19 ^2.0"
+    "simplesamlphp/simplesamlphp": "^2.3"
   },
   "config": {
     "allow-plugins": {
